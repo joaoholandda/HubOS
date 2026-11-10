@@ -17,6 +17,16 @@ use tauri::{AppHandle, Manager};
 pub struct Settings {
     #[serde(default)]
     pub sgdb_key: Option<String>,
+    /// "auto", "light" ou "dark".
+    #[serde(default)]
+    pub theme: Option<String>,
+    /// Cor de destaque em hexadecimal.
+    #[serde(default)]
+    pub accent: Option<String>,
+}
+
+pub fn save_settings(app: &AppHandle, s: &Settings) -> Result<(), String> {
+    write_json(data_dir(app)?.join("settings.json"), s)
 }
 
 fn data_dir(app: &AppHandle) -> Result<PathBuf, String> {

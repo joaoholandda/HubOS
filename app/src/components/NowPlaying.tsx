@@ -8,10 +8,12 @@ interface Props {
   game: Game | undefined;
   onResume: () => void;
   onQuit: () => void;
+  /** Primeiro toque arma; o segundo fecha de verdade. */
+  quitArmed: boolean;
 }
 
 /** Faixa "Em jogo agora": aparece na home quando você volta ao hub com um jogo aberto. */
-export function NowPlaying({ running, game, onResume, onQuit }: Props) {
+export function NowPlaying({ running, game, onResume, onQuit, quitArmed }: Props) {
   const [now, setNow] = useState(() => Date.now());
   useEffect(() => {
     const t = window.setInterval(() => setNow(Date.now()), 1000);
@@ -37,8 +39,8 @@ export function NowPlaying({ running, game, onResume, onQuit }: Props) {
         <span className="g">A</span>
         Voltar ao jogo
       </button>
-      <button className="btn" data-nav onClick={onQuit}>
-        Fechar jogo
+      <button className={`btn${quitArmed ? " danger" : ""}`} data-nav onClick={onQuit}>
+        {quitArmed ? "Confirmar: fechar?" : "Fechar jogo"}
       </button>
     </div>
   );

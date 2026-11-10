@@ -3,6 +3,8 @@
 
 mod console;
 mod covers;
+mod custom;
+mod system;
 
 use std::path::PathBuf;
 
@@ -42,6 +44,7 @@ async fn get_library(app: tauri::AppHandle) -> Result<Library, String> {
             }
             None => warnings.push("Steam não encontrada neste PC.".into()),
         }
+        games.extend(custom::library_games(&app));
         // Capas que você escolheu no SteamGridDB.
         if let Ok(dir) = covers::covers_dir(&app) {
             let _ = app.asset_protocol_scope().allow_directory(&dir, false);
@@ -53,16 +56,139 @@ async fn get_library(app: tauri::AppHandle) -> Result<Library, String> {
     .map_err(|e| e.to_string())
 }
 
-/// Abre um jogo. `launch` vem do próprio `Game` (URL `steam://` ou caminho de .exe).
+/// Abre um jogo. Jogos .exe são acompanhados pelo processo; os da Steam
+/// abrem pela URL `steam://` e são percebidos pelo vigia da Steam.
 #[tauri::command]
-fn launch_game(app: tauri::AppHandle, launch: String) -> Result<(), String> {
-    let is_url = launch.contains("://");
-    let result = if is_url {
-        app.opener().open_url(&launch, None::<&str>)
-    } else {
-        app.opener().open_path(&launch, None::<&str>)
-    };
+fn launch_game(app: tauri::AppHandle, id: String, launch: String) -> Result<(), String> {
+    if id.starts_with("exe:") && launch.to_ascii_lowercase().ends_with(".exe") {
+        let args = custom::games(&app).into_iter().find(|g| g.id == id).map(|g| g.args).unwrap_or_default();
+        return console::spawn_exe(&app, &id, &launch, &args);
+    }
+    open_target(&app, &launch)
+}
+
+/// Abre uma URL, pasta ou arquivo com o programa padrão.
+fn open_target(app: &tauri::AppHandle, target: &str) -> Result<(), String> {
+    let result = if target.contains("://") || target.ends_with(':') { app.opener().open_url(target, None::<&str>) } else { app.opener().open_path(target, None::<&str>) };
     result.map_err(|e| format!("Não consegui abrir: {e}"))
+}
+
+#[tauri::command]
+fn open_external(app: tauri::AppHandle, target: String) -> Result<(), String> {
+    open_target(&app, &target)
+}
+
+/// Fecha o jogo aberto. `install_dir` é a pasta do jogo (para os da Steam).
+#[tauri::command]
+fn close_game(state: tauri::State<console::ConsoleState>, install_dir: Option<String>) -> Result<(), String> {
+    if let Some(pid) = *state.1.lock().unwrap() {
+        return system::kill_pid(pid);
+    }
+    match install_dir {
+        Some(dir) => match system::kill_in_dir(&dir)? {
+            0 => Err("Não achei o processo do jogo. Feche por dentro dele.".into()),
+            _ => Ok(()),
+        },
+        None => Err("Não sei onde este jogo está instalado para fechá-lo.".into()),
+    }
+}
+
+/// Suspender, reiniciar, desligar ou bloquear.
+#[tauri::command]
+fn power(action: String) -> Result<(), String> {
+    system::power(&action)
+}
+
+/// Escolhe um .exe pelo seletor de arquivos e adiciona à biblioteca.
+#[tauri::command]
+async fn add_exe_game(app: tauri::AppHandle) -> Result<Option<String>, String> {
+    use tauri_plugin_dialog::DialogExt;
+    let picked = app.dialog().file().set_title("Escolha o executável do jogo").add_filter("Jogos", &["exe", "lnk", "bat"]).blocking_pick_file();
+    let Some(file) = picked else { return Ok(None) };
+    let path = file.into_path().map_err(|e| e.to_string())?;
+    Ok(Some(custom::add_game(&app, &path)?.id))
+}
+
+#[tauri::command]
+fn remove_game(app: tauri::AppHandle, id: String) -> Result<(), String> {
+    custom::remove_game(&app, &id)
+}
+
+#[tauri::command]
+fn rename_game(app: tauri::AppHandle, id: String, title: String) -> Result<(), String> {
+    custom::rename_game(&app, &id, &title)
+}
+
+#[tauri::command]
+fn get_apps(app: tauri::AppHandle) -> Vec<custom::AppEntry> {
+    custom::apps(&app)
+}
+
+#[tauri::command]
+fn add_app(app: tauri::AppHandle, name: String, target: String) -> Result<Vec<custom::AppEntry>, String> {
+    custom::add_app(&app, &name, &target)
+}
+
+#[tauri::command]
+fn remove_app(app: tauri::AppHandle, id: String) -> Result<Vec<custom::AppEntry>, String> {
+    custom::remove_app(&app, &id)
+}
+
+/// Abre um app ou site da tela Apps.
+#[tauri::command]
+fn open_app(app: tauri::AppHandle, id: String) -> Result<(), String> {
+    let entry = custom::apps(&app).into_iter().find(|a| a.id == id).ok_or("App não encontrado")?;
+    if entry.kind == "site" || entry.target.contains("://") || entry.target.ends_with(':') {
+        open_target(&app, &entry.target)
+    } else {
+        system::start(&entry.target)
+    }
+}
+
+/// Todas as sessões gravadas (para as estatísticas).
+#[tauri::command]
+fn get_all_sessions(app: tauri::AppHandle) -> Vec<hubos_core::sessions::Session> {
+    custom::all_sessions(&app)
+}
+
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+struct SettingsView {
+    has_sgdb_key: bool,
+    theme: String,
+    accent: Option<String>,
+    autostart: bool,
+    steam_root: Option<String>,
+}
+
+#[tauri::command]
+fn get_settings(app: tauri::AppHandle) -> SettingsView {
+    use tauri_plugin_autostart::ManagerExt;
+    let s = covers::settings(&app);
+    SettingsView {
+        has_sgdb_key: s.sgdb_key.is_some(),
+        theme: s.theme.unwrap_or_else(|| "auto".into()),
+        accent: s.accent,
+        autostart: app.autolaunch().is_enabled().unwrap_or(false),
+        steam_root: find_steam_root().map(|p| p.to_string_lossy().into_owned()),
+    }
+}
+
+/// Muda uma configuração: `theme`, `accent` ou `autostart`.
+#[tauri::command]
+fn set_setting(app: tauri::AppHandle, key: String, value: String) -> Result<(), String> {
+    use tauri_plugin_autostart::ManagerExt;
+    let mut s = covers::settings(&app);
+    match key.as_str() {
+        "theme" => s.theme = Some(value),
+        "accent" => s.accent = (!value.is_empty()).then_some(value),
+        "autostart" => {
+            let r = if value == "true" { app.autolaunch().enable() } else { app.autolaunch().disable() };
+            return r.map_err(|e| e.to_string());
+        }
+        other => return Err(format!("Configuração desconhecida: {other}")),
+    }
+    covers::save_settings(&app, &s)
 }
 
 /// Jogo rodando agora, para a interface saber ao (re)abrir.
@@ -175,6 +301,7 @@ pub fn run() {
         // Uma instância só: abrir de novo traz a que já está rodando.
         .plugin(tauri_plugin_single_instance::init(|app, _, _| console::show_hub(app)))
         .plugin(tauri_plugin_opener::init())
+        .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_autostart::init(tauri_plugin_autostart::MacosLauncher::LaunchAgent, None))
         .plugin(
             tauri_plugin_global_shortcut::Builder::new()
@@ -186,7 +313,7 @@ pub fn run() {
                 .build(),
         )
         .manage(console::ConsoleState::default())
-        .invoke_handler(tauri::generate_handler![get_library, launch_game, get_game_state, hide_hub, get_sessions, has_sgdb_key, set_sgdb_key, cover_options, set_cover, reset_cover])
+        .invoke_handler(tauri::generate_handler![get_library, launch_game, open_external, close_game, power, add_exe_game, remove_game, rename_game, get_apps, add_app, remove_app, open_app, get_all_sessions, get_settings, set_setting, get_game_state, hide_hub, get_sessions, has_sgdb_key, set_sgdb_key, cover_options, set_cover, reset_cover])
         .setup(move |app| {
             // Em desenvolvimento, abre em janela para não prender a tela.
             #[cfg(debug_assertions)]

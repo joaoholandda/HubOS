@@ -20,7 +20,7 @@ const SORTS: { label: string; cmp: (a: Game, b: Game) => number }[] = [
 const SOURCE_ORDER: Source[] = ["steam", "xbox", "ra", "exe", "epic"];
 
 /** Biblioteca completa: todas as origens juntas, com filtros, ordem e busca. */
-export function GamesPage({ games, onOpen }: { games: Game[]; onOpen: (g: Game) => void }) {
+export function GamesPage({ games, onOpen, onAdd }: { games: Game[]; onOpen: (g: Game) => void; onAdd: () => void }) {
   const [filter, setFilter] = useState(0);
   const [sort, setSort] = useState(0);
   const [query, setQuery] = useState("");
@@ -57,6 +57,10 @@ export function GamesPage({ games, onOpen }: { games: Game[]; onOpen: (g: Game) 
         <span className="muted tnum">
           {list.length} de {games.length}
         </span>
+        <div className="spacer" />
+        <button className="chip" data-nav onClick={onAdd}>
+          + Adicionar jogo (.exe)
+        </button>
       </div>
       <div className="toolbar">
         <span className="bumper">LB</span>

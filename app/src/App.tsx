@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { getGameState, getLibrary, hideHub, inTauri, launchGame, onGameState, type Game, type Library, type RunningGame } from "./lib/api";
+import { addExeGame, applyAppearance, closeGame, getGameState, getLibrary, getSettings, hideHub, inTauri, launchGame, onGameState, type Game, type Library, type RunningGame } from "./lib/api";
 import { totalHours } from "./lib/format";
 import { focusEngine } from "./nav/focus";
 import { useInput, type Action } from "./nav/input";
@@ -11,10 +11,14 @@ import { CoverPicker } from "./components/CoverPicker";
 import { GamePage } from "./components/GamePage";
 import { GamesPage } from "./components/GamesPage";
 import { dispatchToPage } from "./nav/actions";
+import { AppsPage } from "./components/AppsPage";
+import { PowerSheet } from "./components/PowerSheet";
+import { SettingsPage } from "./components/SettingsPage";
+import { StatsPage } from "./components/StatsPage";
 import { TopBar } from "./components/TopBar";
 import { useToast } from "./components/Toast";
 
-type Route = { page: "home" } | { page: "games" } | { page: "game"; id: string };
+type Route = { page: "home" } | { page: "games" } | { page: "apps" } | { page: "stats" } | { page: "settings" } | { page: "game"; id: string };
 
 export default function App() {
   const [route, setRoute] = useState<Route>({ page: "home" });
@@ -28,8 +32,17 @@ export default function App() {
   const [pad, setPad] = useState(false);
   const [running, setRunning] = useState<RunningGame | null>(null);
   const [coverFor, setCoverFor] = useState<Game | null>(null);
+  const [powerOpen, setPowerOpen] = useState(false);
+  const [quitArmed, setQuitArmed] = useState(false);
   const coverOpen = useRef(false);
   coverOpen.current = !!coverFor;
+  const powerRef = useRef(false);
+  powerRef.current = powerOpen;
+
+  // Tema e cor de destaque salvos.
+  useEffect(() => {
+    getSettings().then(applyAppearance).catch(() => {});
+  }, []);
   const [toastNode, toast] = useToast();
   const mainRef = useRef<HTMLElement>(null);
   const libRef = useRef<Library | null>(null);
@@ -96,6 +109,10 @@ export default function App() {
       if (a === "back") setCoverFor(null);
       return;
     }
+    if (powerRef.current) {
+      if (a === "back") setPowerOpen(false);
+      return;
+    }
     if (a === "menu") return setDrawer((d) => !d);
     if (drawerOpen.current) {
       if (a === "back") setDrawer(false);
@@ -133,12 +150,26 @@ export default function App() {
     (m: MenuItem) => {
       setDrawer(false);
       if (m.id === "home") return go({ page: "home" }, false);
-      if (m.id === "games") return go({ page: "games" }, false);
+      if (m.id === "games" || m.id === "apps" || m.id === "stats" || m.id === "settings") return go({ page: m.id }, false);
+      if (m.id === "power") return setPowerOpen(true);
+      if (m.id === "desktop") return void hideHub();
       if (m.soon) toast(`${m.label}: chega nas próximas etapas`);
     },
     [toast, go],
   );
   const closeDrawer = useCallback(() => setDrawer(false), []);
+  const addGame = useCallback(async () => {
+    if (!inTauri) return toast("No PC, abre o seletor de arquivos para escolher o .exe.");
+    try {
+      const id = await addExeGame();
+      if (!id) return;
+      setLib(await getLibrary());
+      go({ page: "game", id });
+      toast("Jogo adicionado. Dá para trocar a capa aqui.");
+    } catch (e) {
+      toast(String(e));
+    }
+  }, [toast, go]);
   const changeCover = useCallback((g: Game, path: string | null) => {
     if (path === null) {
       // Voltou à capa original: relê a biblioteca para pegar o caminho da loja.
@@ -156,13 +187,28 @@ export default function App() {
       running={running}
       game={runningGame}
       onResume={() => (inTauri ? hideHub() : toast("No PC, o hub sairia da frente e o jogo voltaria."))}
-      onQuit={() => toast("Fechar jogo pelo hub chega na próxima etapa. Por enquanto, feche pelo próprio jogo.")}
+      quitArmed={quitArmed}
+      onQuit={async () => {
+        // Fechar jogo pede confirmação: o progresso não salvo se perde.
+        if (!quitArmed) {
+          setQuitArmed(true);
+          window.setTimeout(() => setQuitArmed(false), 3000);
+          return;
+        }
+        setQuitArmed(false);
+        if (!inTauri) return setRunning(null);
+        try {
+          await closeGame(runningGame);
+        } catch (e) {
+          toast(String(e));
+        }
+      }}
     />
   ) : null;
 
   return (
     <div className="app">
-      {route.page !== "games" && <Backdrop game={route.page === "game" ? (pageGame ?? focused) : focused} />}
+      {(route.page === "home" || route.page === "game") && <Backdrop game={route.page === "game" ? (pageGame ?? focused) : focused} />}
       <TopBar onMenu={() => setDrawer(true)} onBack={route.page === "home" ? undefined : goBack} totalLabel={totalHours(games)} padConnected={pad} />
       <main className="main" ref={mainRef} data-nav-scroll>
         {error ? (
@@ -173,15 +219,22 @@ export default function App() {
         ) : !lib ? (
           <div className="loading" aria-label="Carregando jogos" />
         ) : route.page === "games" ? (
-          <GamesPage games={games} onOpen={details} />
+          <GamesPage games={games} onOpen={details} onAdd={addGame} />
+        ) : route.page === "apps" ? (
+          <AppsPage toast={toast} />
+        ) : route.page === "stats" ? (
+          <StatsPage games={games} onOpen={details} />
+        ) : route.page === "settings" ? (
+          <SettingsPage toast={toast} />
         ) : route.page === "game" && pageGame ? (
           <GamePage game={pageGame} onPlay={play} onCover={setCoverFor} />
         ) : (
           <Home games={games} onPlay={play} onDetails={details} onCover={setCoverFor} onFocusGame={setFocused} banner={banner} />
         )}
       </main>
-      <Drawer open={drawer} current={route.page === "home" ? "home" : "games"} onPick={pick} onClose={closeDrawer} />
+      <Drawer open={drawer} current={route.page === "game" ? "games" : route.page} onPick={pick} onClose={closeDrawer} />
       {coverFor && <CoverPicker game={coverFor} onClose={() => setCoverFor(null)} onChanged={changeCover} toast={toast} />}
+      {powerOpen && <PowerSheet gameOpen={runningGame?.title ?? (running ? "Um jogo" : null)} onClose={() => setPowerOpen(false)} onDesktop={() => void hideHub()} toast={toast} />}
       {toastNode}
     </div>
   );

@@ -32,7 +32,27 @@ struct Session<'a> {
 }
 
 #[derive(Default)]
-pub struct ConsoleState(pub Mutex<GameState>);
+pub struct ConsoleState(pub Mutex<GameState>, pub Mutex<Option<u32>>);
+
+/// Abre um jogo .exe e acompanha o processo: a sessão vai do início ao fim dele.
+pub fn spawn_exe(app: &AppHandle, id: &str, exe: &str, args: &str) -> Result<(), String> {
+    let path = std::path::Path::new(exe);
+    let mut cmd = std::process::Command::new(path);
+    cmd.args(args.split_whitespace());
+    if let Some(dir) = path.parent() {
+        cmd.current_dir(dir);
+    }
+    let mut child = cmd.spawn().map_err(|e| format!("Não consegui abrir o jogo: {e}"))?;
+    *app.state::<ConsoleState>().1.lock().unwrap() = Some(child.id());
+    set_running(app, Some(id.to_string()));
+    let app = app.clone();
+    std::thread::spawn(move || {
+        let _ = child.wait();
+        *app.state::<ConsoleState>().1.lock().unwrap() = None;
+        set_running(&app, None);
+    });
+    Ok(())
+}
 
 pub fn now() -> u64 {
     SystemTime::now().duration_since(UNIX_EPOCH).map(|d| d.as_secs()).unwrap_or(0)

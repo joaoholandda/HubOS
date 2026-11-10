@@ -41,9 +41,10 @@ export class FocusEngine {
 
   focus(el: HTMLElement | null | undefined, opts: { scroll?: boolean } = {}) {
     if (!el) return;
-    if (this.current && this.current !== el) this.current.classList.remove("is-focus");
+    // Atributo (e não classe): o React reescreve `className` e apagaria o foco.
+    if (this.current && this.current !== el) this.current.removeAttribute("data-focused");
     this.current = el;
-    el.classList.add("is-focus");
+    el.setAttribute("data-focused", "");
     el.focus({ preventScroll: true });
     const row = el.closest<HTMLElement>("[data-nav-row]");
     if (row) this.rowMemory.set(row, el);
