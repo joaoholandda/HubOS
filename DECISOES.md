@@ -76,5 +76,7 @@
 | 57 | Abertura, erros, emuladores | DECIDIDO (padrão proposto) | Splash curto; avisos de offline/Steam fora/jogo não abriu; emulador por console em Biblioteca | 2026-11-10 |
 | 58 | Busca de capas | DECIDIDO | SteamGridDB dentro do hub (grade de opções, chave grátis do usuário). Sem Google Imagens | 2026-11-10 |
 | 59 | Escala de cantos | DECIDIDO | Só 4 raios: 8px (tags, badges, botões secundários), 14px (capas, menu, botões, campos), 22px (painéis, modais, menu lateral, chips), redondo (avatares, busca, indicadores) | 2026-11-10 |
-| 60 | Fontes | em aberto | Opções: Syne ou Sora (títulos) + DM Sans ou Plus Jakarta Sans (texto) | |
+| 60 | Fontes | DECIDIDO | Sora (títulos) + Plus Jakarta Sans (texto) | 2026-11-10 |
+| 61 | Cores | DECIDIDO | NADA de verde. Botão principal monocromático (tinta do tema); ícones do controle só em contorno; capas provisórias em grafite neutro | 2026-11-10 |
+| 62 | Direção visual | DECIDIDO | O mais profissional possível: foco em anel duplo, tipografia ajustada, poucas cores | 2026-11-10 |
 | 8 | Firefox / apps instantâneos | DECIDIDO | Mantém o app aberto e escondido; ao clicar, só traz a janela para frente | 2026-11-10 |

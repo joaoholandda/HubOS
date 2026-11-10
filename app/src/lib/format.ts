@@ -33,10 +33,11 @@ export function totalHours(games: Game[]): string {
   return `${Math.round(m / 60).toLocaleString("pt-BR")} h jogadas`;
 }
 
-/** Cor estável por jogo, para a capa provisória quando não há imagem. */
+/** Capa provisória (sem imagem): grafite neutro, variando só o tom, nunca verde. */
 export function tint(id: string): [string, string] {
   let h = 0;
   for (const c of id) h = (h * 31 + c.charCodeAt(0)) >>> 0;
-  const hue = h % 360;
-  return [`hsl(${hue} 35% 18%)`, `hsl(${(hue + 40) % 360} 45% 38%)`];
+  const hue = 215 + (h % 40); // azul-acinzentado → índigo
+  const light = 16 + (h % 7);
+  return [`hsl(${hue} 10% ${light}%)`, `hsl(${hue + 8} 14% ${light + 16}%)`];
 }

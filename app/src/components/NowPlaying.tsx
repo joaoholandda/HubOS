@@ -33,8 +33,8 @@ export function NowPlaying({ running, game, onResume, onQuit }: Props) {
         <b>{game?.title ?? running.id}</b>
         <span>Sessão de {hms}</span>
       </div>
-      <button className="btn play" data-nav data-nav-default onClick={onResume}>
-        <span className="g a">A</span>
+      <button className="btn primary" data-nav data-nav-default onClick={onResume}>
+        <span className="g">A</span>
         Voltar ao jogo
       </button>
       <button className="btn" data-nav onClick={onQuit}>

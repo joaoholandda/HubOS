@@ -70,15 +70,15 @@ function HeroInfo({ game, onPlay, onDetails, onCover }: { game: Game; onPlay: (g
         </span>
       </p>
       <div className="btns">
-        <button className="btn play" data-nav onClick={() => onPlay(game)}>
-          <span className="g a">A</span>
+        <button className="btn primary" data-nav onClick={() => onPlay(game)}>
+          <span className="g">A</span>
           {game.installed ? "Jogar" : "Instalar"}
         </button>
         <button className="btn" data-nav onClick={() => onDetails(game)}>
           Detalhes
         </button>
         <button className="btn" data-nav onClick={() => onCover(game)}>
-          <span className="g x">X</span>
+          <span className="g">X</span>
           Trocar capa
         </button>
       </div>

@@ -112,7 +112,7 @@ export function CoverPicker({ game, onClose, onChanged, toast }: Props) {
               Abrir a página da chave
             </button>
             <input className="field" data-nav data-nav-default value={key} onChange={(e) => setKey(e.target.value)} placeholder="Cole a chave aqui" spellCheck={false} />
-            <button className="btn play" data-nav onClick={saveKey} disabled={!key.trim()}>
+            <button className="btn primary" data-nav onClick={saveKey} disabled={!key.trim()}>
               Salvar e buscar capas
             </button>
           </div>
