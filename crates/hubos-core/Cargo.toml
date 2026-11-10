@@ -1,0 +1,12 @@
+[package]
+name = "hubos-core"
+description = "Lógica do HubOS que não depende de interface: leitura das bibliotecas de jogos."
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+serde = { version = "1", features = ["derive"] }
+
+[dev-dependencies]
+serde_json = "1"

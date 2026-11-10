@@ -2,6 +2,32 @@
 
 Meu console dentro do PC: uma interface em tela cheia, com cara de console, por cima do Windows. O PC continua sendo PC: Firefox, Discord, Spotify e Claude abrem na hora.
 
+## Baixar e testar no Windows
+
+Cada envio para a `main` gera o instalador automaticamente:
+GitHub → aba **Actions** → último "Build" verde → em **Artifacts**, baixe **HubOS-windows**.
+Dentro tem o instalador (`HubOS_..._x64-setup.exe`) e o `hubos.exe` solto.
+
+Atalhos nesta versão: setas / controle navegam, Enter / A abre, Esc / B volta, M ou botão ☰ do controle abre o menu. Alt+F4 fecha.
+
+## Rodar a partir do código (no Windows)
+
+Precisa de [Node 22](https://nodejs.org) e [Rust](https://rustup.rs).
+
+```bash
+cd app
+npm install
+npm run tauri dev
+```
+
+`npm run dev` sozinho abre só a interface no navegador, com jogos de exemplo.
+
+## Estrutura
+
+- `crates/hubos-core`: lógica sem interface (leitor de `.vdf`, biblioteca da Steam). Testes: `cargo test -p hubos-core`.
+- `app/src-tauri`: lado Rust do app (comandos chamados pela interface).
+- `app/src`: interface em React. `nav/` tem o motor de foco e a entrada (teclado, mouse, controle).
+
 ## O que tem aqui hoje
 
 - `DECISOES.md`: todas as decisões de UX/UI e de arquitetura, uma por linha, com data.

@@ -1,0 +1,8 @@
+# dependências e builds
+node_modules/
+app/dist/
+target/
+app/src-tauri/gen/schemas/
+# sistema
+.DS_Store
+Thumbs.db

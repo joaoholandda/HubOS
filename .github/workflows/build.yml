@@ -1,0 +1,44 @@
+name: Build
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  testes:
+    name: Testes do núcleo (Rust)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      - run: cargo test -p hubos-core
+
+  windows:
+    name: App para Windows
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: app/package-lock.json
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      - name: Instalar dependências da interface
+        working-directory: app
+        run: npm ci
+      - name: Gerar o instalador
+        working-directory: app
+        run: npm run tauri build
+      - name: Publicar instalador e .exe
+        uses: actions/upload-artifact@v4
+        with:
+          name: HubOS-windows
+          path: |
+            target/release/bundle/nsis/*.exe
+            target/release/hubos.exe
+          if-no-files-found: error

@@ -1,0 +1,42 @@
+import type { Game, Source } from "./api";
+
+export const SOURCE_LABEL: Record<Source, string> = {
+  steam: "Steam",
+  xbox: "Xbox",
+  epic: "Epic",
+  exe: ".exe",
+  ra: "RetroAchievements",
+};
+
+export function hours(minutes: number | null): string {
+  if (!minutes) return "0 h";
+  if (minutes < 60) return `${minutes} min`;
+  return `${Math.round(minutes / 60).toLocaleString("pt-BR")} h`;
+}
+
+/** "Hoje, 01:12", "Ontem", "Há 3 dias", "12/03". */
+export function lastPlayed(unix: number | null): string {
+  if (!unix) return "Nunca";
+  const d = new Date(unix * 1000);
+  const today = new Date();
+  const startOf = (x: Date) => new Date(x.getFullYear(), x.getMonth(), x.getDate()).getTime();
+  const days = Math.round((startOf(today) - startOf(d)) / 86400000);
+  if (days <= 0) return `Hoje, ${d.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}`;
+  if (days === 1) return "Ontem";
+  if (days < 7) return `Há ${days} dias`;
+  if (days < 365) return d.toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" });
+  return d.toLocaleDateString("pt-BR", { month: "2-digit", year: "numeric" });
+}
+
+export function totalHours(games: Game[]): string {
+  const m = games.reduce((a, g) => a + (g.playtimeMinutes ?? 0), 0);
+  return `${Math.round(m / 60).toLocaleString("pt-BR")} h jogadas`;
+}
+
+/** Cor estável por jogo, para a capa provisória quando não há imagem. */
+export function tint(id: string): [string, string] {
+  let h = 0;
+  for (const c of id) h = (h * 31 + c.charCodeAt(0)) >>> 0;
+  const hue = h % 360;
+  return [`hsl(${hue} 35% 18%)`, `hsl(${(hue + 40) % 360} 45% 38%)`];
+}
