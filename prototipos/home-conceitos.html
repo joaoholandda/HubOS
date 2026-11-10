@@ -1,0 +1,684 @@
+<title>HubOS Home</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&family=Inter:wght@400;500;600&display=swap">
+<style>
+/* Layout: shell de console em tela cheia — barra superior fixa, palco central que muda por conceito, barra de dicas do controle embaixo. */
+:root{
+  --bg:#E6E8EB; --surface:#F3F4F6; --surface-2:#FFFFFF; --ink:#14171B; --ink-2:#555D69;
+  --line:rgba(20,24,30,.10); --accent:#2F5BE0; --ring:#14171B; --shadow:rgba(20,24,30,.35);
+  --play:#16884A; --on-art:#FFFFFF;
+  --pad-a:#3FA34D; --pad-b:#D2453B; --pad-x:#2F78DA; --pad-y:#DDAA1F;
+  --display:"Archivo", "Segoe UI", system-ui, sans-serif;
+  --body:"Inter", "Segoe UI", system-ui, sans-serif;
+  --ease:cubic-bezier(.2,.8,.2,1);
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0F1114; --surface:#191C21; --surface-2:#22262C; --ink:#EDEFF2; --ink-2:#99A1AD;
+  --line:rgba(255,255,255,.08); --accent:#7C97FF; --ring:#F4F6F8; --shadow:rgba(0,0,0,.6); --play:#2BAA62;
+  color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0F1114; --surface:#191C21; --surface-2:#22262C; --ink:#EDEFF2; --ink-2:#99A1AD;
+  --line:rgba(255,255,255,.08); --accent:#7C97FF; --ring:#F4F6F8; --shadow:rgba(0,0,0,.6); --play:#2BAA62;
+  color-scheme:dark}
+
+[hidden]{display:none!important}
+html,body{height:100%}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;overflow:hidden;-webkit-font-smoothing:antialiased}
+button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer;text-align:left}
+[data-nav]{outline:none}
+.svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:none}
+
+#app{position:relative;height:100%;display:grid;grid-template-rows:auto minmax(0,1fr) auto;
+  padding-left:max(16px, env(safe-area-inset-left, 0px));padding-right:max(16px, env(safe-area-inset-right, 0px))}
+.inner{padding-inline:clamp(0px,2.4vw,40px)}
+
+/* ---------- barra superior ---------- */
+.top{position:relative;z-index:3;display:flex;align-items:center;gap:12px;padding-block:14px;flex-wrap:wrap}
+.chip{display:inline-flex;align-items:center;gap:10px;height:44px;padding:0 14px;border-radius:22px;
+  background:color-mix(in srgb,var(--surface) 78%,transparent);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  transition:box-shadow .18s var(--ease),transform .18s var(--ease),background .18s;white-space:nowrap}
+.chip.round{width:44px;padding:0;justify-content:center}
+.chip.f,.tab.f,.btn.f,.app.f,.row-item.f,.opt.f{box-shadow:0 0 0 3px var(--ring),0 10px 24px -10px var(--shadow);transform:scale(1.04)}
+.avatar{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:var(--accent);color:#fff;font:700 13px var(--display)}
+.who{display:grid;line-height:1.15}
+.who b{font-weight:600;font-size:14px}
+.who small{color:var(--ink-2);font-size:12px;font-variant-numeric:tabular-nums}
+.spacer{flex:1}
+.tabs{display:flex;align-items:center;gap:6px;padding:4px;border-radius:24px;background:color-mix(in srgb,var(--surface) 78%,transparent);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
+.tab{height:36px;padding:0 16px;border-radius:18px;font-weight:500;font-size:14px;color:var(--ink-2);transition:background .18s,color .18s,box-shadow .18s,transform .18s var(--ease)}
+.tab[aria-selected="true"]{background:var(--ink);color:var(--bg)}
+.bumper{font:700 11px var(--display);letter-spacing:.06em;padding:4px 8px;border-radius:6px;background:var(--line);color:var(--ink-2)}
+.stack{display:flex}
+.stack i{width:22px;height:22px;border-radius:50%;border:2px solid var(--surface);margin-left:-7px;display:block}
+.stack i:first-child{margin-left:0}
+.clock{font:600 17px var(--display);font-variant-numeric:tabular-nums;padding-inline:6px}
+.muted-ico{color:var(--pad-b)}
+
+/* ---------- palco ---------- */
+.main{position:relative;z-index:1;overflow-y:auto;overflow-x:hidden;scrollbar-width:none;overscroll-behavior:contain}
+.main::-webkit-scrollbar{display:none}
+.view{min-height:100%}
+
+/* cartões de jogo */
+.card{position:relative;flex:0 0 auto;border-radius:10px;overflow:hidden;background:var(--surface-2);max-width:100%;
+  transition:transform .2s var(--ease),box-shadow .2s var(--ease);will-change:transform;
+  box-shadow:0 6px 16px -10px var(--shadow)}
+.card.f{transform:scale(1.07);box-shadow:0 0 0 3px var(--ring),0 24px 40px -14px var(--shadow);z-index:2}
+.card .art{position:absolute;inset:0;background-size:cover;background-position:center}
+.cover{height:var(--ch,240px);aspect-ratio:2/3}
+.cover .art{background-image:var(--p)}
+.wide{height:var(--wh,200px);aspect-ratio:16/9}
+.wide .art{background-image:var(--l)}
+.cv-title{position:absolute;left:12px;right:12px;bottom:12px;color:var(--on-art);font:800 clamp(15px,1.25vw,19px)/1.02 var(--display);font-stretch:112%;
+  text-wrap:balance;text-shadow:0 2px 10px rgba(0,0,0,.45)}
+.src{position:absolute;top:10px;left:10px;font:700 10px var(--display);letter-spacing:.08em;text-transform:uppercase;
+  padding:4px 7px;border-radius:5px;background:rgba(10,12,16,.62);color:#fff;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+.wide .cv-sub{position:absolute;left:14px;right:14px;bottom:12px;color:rgba(255,255,255,.85);font-size:12.5px;font-variant-numeric:tabular-nums}
+.wide .cv-title{bottom:34px;font-size:clamp(17px,1.5vw,22px)}
+.bar{position:absolute;left:0;right:0;bottom:0;height:4px;background:rgba(255,255,255,.22)}
+.bar i{display:block;height:100%;background:var(--on-art)}
+
+.row{position:relative;display:flex;gap:clamp(12px,1.3vw,20px);overflow-x:auto;overflow-y:hidden;
+  padding:20px 16px 28px;margin-inline:-16px;scrollbar-width:none}
+.row::-webkit-scrollbar{display:none}
+
+/* ---------- conceito 1: fileira ---------- */
+.bd{position:fixed;inset:0;z-index:0;pointer-events:none}
+.bd-l{position:absolute;inset:0;background-size:cover;background-position:center 30%;opacity:0;transition:opacity .5s ease;transform:scale(1.03)}
+.bd-l.on{opacity:1}
+.bd-scrim{position:absolute;inset:0;background:
+  linear-gradient(90deg,var(--bg) 0%,color-mix(in srgb,var(--bg) 85%,transparent) 28%,color-mix(in srgb,var(--bg) 25%,transparent) 60%,transparent 82%),
+  linear-gradient(0deg,var(--bg) 0%,color-mix(in srgb,var(--bg) 80%,transparent) 26%,transparent 56%),
+  linear-gradient(180deg,color-mix(in srgb,var(--bg) 75%,transparent) 0%,transparent 16%)}
+#v1{display:grid;grid-template-rows:1fr auto;gap:2vh}
+.hero-info{align-self:end;display:grid;gap:14px;max-width:min(760px,100%);padding-top:4vh}
+.pill{justify-self:start;font:700 11px var(--display);letter-spacing:.1em;text-transform:uppercase;padding:6px 10px;border-radius:6px;background:var(--ink);color:var(--bg)}
+.h-title{font:800 clamp(2.3rem,5.4vw,5rem)/.94 var(--display);font-stretch:118%;letter-spacing:-.01em;text-wrap:balance;margin:0}
+.h-meta{display:flex;flex-wrap:wrap;gap:8px 22px;color:var(--ink-2);font-size:15px;font-variant-numeric:tabular-nums;margin:0}
+.h-meta b{color:var(--ink);font-weight:600}
+.btns{display:flex;gap:12px;flex-wrap:wrap;margin-top:6px}
+.btn{height:50px;padding:0 24px;border-radius:12px;display:inline-flex;align-items:center;gap:10px;font-weight:600;font-size:15.5px;
+  background:color-mix(in srgb,var(--surface) 85%,transparent);transition:transform .18s var(--ease),box-shadow .18s var(--ease)}
+.btn.play{background:var(--play);color:#fff}
+.btn .g{width:22px;height:22px;font-size:11px}
+#v1 .row{--ch:clamp(170px,27vh,330px)}
+
+/* ---------- conceito 2: prateleiras ---------- */
+#v2{padding-block:6px 30px}
+.shelf{margin-bottom:6px}
+.shelf h2{display:flex;align-items:baseline;gap:12px;margin:14px 0 0;font:700 clamp(18px,1.5vw,22px) var(--display);font-stretch:110%}
+.shelf h2 small{font:400 13.5px var(--body);color:var(--ink-2)}
+.shelf.cur h2{color:var(--accent)}
+#v2 .row{--ch:clamp(170px,24vh,280px);--wh:clamp(150px,22vh,240px)}
+.app{flex:0 0 auto;width:clamp(190px,17vw,250px);height:110px;border-radius:14px;background:var(--surface);padding:16px;display:grid;align-content:space-between;
+  transition:transform .2s var(--ease),box-shadow .2s var(--ease)}
+.app .svg{width:26px;height:26px}
+.app b{display:block;font-weight:600}
+.app small{color:var(--ink-2);font-size:12.5px}
+
+/* ---------- conceito 3: painéis ---------- */
+#v3{padding-block:6px 30px}
+.panels{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));grid-auto-rows:clamp(108px,15vh,168px);gap:14px}
+.tile{position:relative;border-radius:14px;background:var(--surface);overflow:hidden;padding:18px;display:flex;flex-direction:column;gap:8px;min-width:0;
+  transition:transform .2s var(--ease),box-shadow .2s var(--ease)}
+.tile.f{transform:scale(1.025);box-shadow:0 0 0 3px var(--ring),0 24px 40px -16px var(--shadow);z-index:2}
+.tile .label{font:700 11px var(--display);letter-spacing:.1em;text-transform:uppercase;color:var(--ink-2)}
+.t-hero{grid-column:span 6;grid-row:span 2;justify-content:flex-end;color:var(--on-art)}
+.t-hero .art{position:absolute;inset:0;background-size:cover;background-position:center;background-image:var(--l)}
+.t-hero::after{content:"";position:absolute;inset:0;background:linear-gradient(0deg,rgba(8,10,14,.82),rgba(8,10,14,.1) 60%)}
+.t-hero > *:not(.art){position:relative;z-index:1}
+.t-hero .label{color:rgba(255,255,255,.75)}
+.t-hero h3{margin:0;font:800 clamp(26px,2.8vw,44px)/.95 var(--display);font-stretch:118%}
+.t-hero p{margin:0;color:rgba(255,255,255,.82);font-variant-numeric:tabular-nums}
+.t-party{grid-column:span 3;grid-row:span 2}
+.t-audio,.t-stats{grid-column:span 3}
+.t-mini{grid-column:span 2;grid-row:span 2;padding:0}
+.t-mini .art{position:absolute;inset:0;background-size:cover;background-position:center;background-image:var(--p)}
+.t-app{grid-column:span 3;justify-content:space-between}
+.t-app .svg{width:26px;height:26px}
+.t-app b{font-weight:600}
+.members{display:grid;gap:10px;margin-top:4px}
+.mem{display:flex;align-items:center;gap:10px;font-size:14px}
+.mem i{width:28px;height:28px;border-radius:50%;flex:none;position:relative}
+.mem i.talk{box-shadow:0 0 0 2px var(--surface),0 0 0 4px var(--pad-a)}
+.mem span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mem .svg{width:16px;height:16px;color:var(--pad-b)}
+.big{font:700 clamp(22px,2vw,30px) var(--display);font-variant-numeric:tabular-nums}
+.bars{display:flex;align-items:flex-end;gap:6px;margin-top:auto}
+.bars span{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;font-size:10px;color:var(--ink-2)}
+.bars i{display:block;width:100%;border-radius:3px 3px 0 0;background:var(--accent)}
+.eq{display:flex;align-items:center;gap:4px;height:34px}
+.eq i{flex:1;border-radius:2px;background:var(--accent);opacity:.85}
+
+/* ---------- dicas do controle ---------- */
+.hints{position:relative;z-index:3;display:flex;align-items:center;gap:10px 22px;flex-wrap:wrap;padding-block:12px;font-size:13.5px;color:var(--ink-2)}
+.hint{display:inline-flex;align-items:center;gap:8px}
+.g{display:inline-grid;place-items:center;width:24px;height:24px;border-radius:50%;color:#fff;font:700 12px var(--display)}
+.g.a{background:var(--pad-a)}.g.b{background:var(--pad-b)}.g.x{background:var(--pad-x)}.g.y{background:var(--pad-y);color:#1a1400}
+.pad{display:inline-flex;align-items:center;gap:8px;padding:6px 12px;border-radius:16px;background:var(--surface);color:var(--ink)}
+.pad .dot{width:8px;height:8px;border-radius:50%;background:var(--ink-2)}
+.pad.on .dot{background:var(--pad-a)}
+.example{margin-left:auto;font-size:12px;opacity:.8}
+
+/* ---------- painéis laterais e modal ---------- */
+.veil{position:fixed;inset:0;z-index:8;background:rgba(6,8,12,.45);opacity:0;transition:opacity .25s ease}
+.veil.open{opacity:1}
+.sheet{position:fixed;top:0;right:0;bottom:0;z-index:9;width:min(420px,100%);background:var(--surface);
+  padding:calc(24px + env(safe-area-inset-top,0px)) calc(24px + env(safe-area-inset-right,0px)) calc(24px + env(safe-area-inset-bottom,0px)) 24px;
+  display:flex;flex-direction:column;gap:14px;transform:translateX(105%);transition:transform .28s var(--ease);box-shadow:-30px 0 60px -30px var(--shadow);overflow-y:auto}
+.sheet.open{transform:none}
+.sheet h3{margin:0;font:800 28px var(--display);font-stretch:112%}
+.sheet .sub{margin:-8px 0 4px;color:var(--ink-2);font-size:14px}
+.opt{display:flex;align-items:center;gap:12px;min-height:52px;padding:0 16px;border-radius:12px;background:var(--surface-2);font-weight:500;
+  transition:transform .18s var(--ease),box-shadow .18s var(--ease)}
+.opt small{margin-left:auto;color:var(--ink-2);font-weight:400}
+.opt[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
+.opt[aria-pressed="true"] small{color:inherit;opacity:.7}
+.opt.danger{color:var(--pad-b)}
+.grp{font:700 11px var(--display);letter-spacing:.1em;text-transform:uppercase;color:var(--ink-2);margin-top:8px}
+.presets{display:flex;flex-wrap:wrap;gap:8px}
+.presets .opt{min-height:42px}
+.modal{position:fixed;z-index:9;left:50%;top:50%;width:min(560px,calc(100% - 32px));transform:translate(-50%,-46%) scale(.97);opacity:0;
+  transition:transform .28s var(--ease),opacity .2s ease;background:var(--surface);border-radius:18px;overflow:hidden;box-shadow:0 40px 80px -30px var(--shadow)}
+.modal.open{transform:translate(-50%,-50%);opacity:1}
+.m-art{aspect-ratio:16/9;max-width:100%;background-size:cover;background-position:center;position:relative}
+.m-art::after{content:"";position:absolute;inset:0;background:linear-gradient(0deg,var(--surface),transparent 55%)}
+.m-body{padding:4px 24px 24px;display:grid;gap:12px}
+.m-body h3{margin:0;font:800 28px/1 var(--display);font-stretch:115%}
+.m-body p{margin:0;color:var(--ink-2);line-height:1.5}
+.prog{height:6px;border-radius:3px;background:var(--line);overflow:hidden}
+.prog i{display:block;height:100%;width:0;background:var(--play)}
+.prog.run i{animation:fill 1.6s var(--ease) forwards}
+@keyframes fill{to{width:100%}}
+.toast{position:fixed;z-index:10;left:50%;bottom:calc(70px + env(safe-area-inset-bottom,0px));transform:translate(-50%,20px);opacity:0;
+  background:var(--ink);color:var(--bg);padding:12px 18px;border-radius:12px;font-size:14px;max-width:calc(100% - 32px);transition:opacity .2s,transform .25s var(--ease);pointer-events:none}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+
+/* ---------- responsivo ---------- */
+@media (max-width:1100px){
+  .panels{grid-template-columns:repeat(6,minmax(0,1fr))}
+  .t-hero{grid-column:span 6}
+  .t-party{grid-column:span 3}
+  .t-audio,.t-stats{grid-column:span 3}
+  .t-mini{grid-column:span 2}
+  .t-app{grid-column:span 3}
+}
+@media (max-width:760px){
+  .tabs{order:5;width:100%;justify-content:center}
+  .clock,.who small,.example{display:none}
+  .panels{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .t-hero,.t-party{grid-column:span 2}
+  .t-audio,.t-stats,.t-mini,.t-app{grid-column:span 1}
+  .hints{gap:8px 14px;font-size:12.5px}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{transition-duration:.01ms!important;animation-duration:.01ms!important;scroll-behavior:auto!important}
+}
+</style>
+
+<div id="app">
+  <header class="top inner" id="top">
+    <button class="chip" data-nav data-act="profile" aria-label="Perfil">
+      <span class="avatar">V</span>
+      <span class="who"><b>Perfil</b><small id="totalh"></small></span>
+    </button>
+    <div class="spacer"></div>
+    <div class="tabs" role="tablist" aria-label="Conceitos de home">
+      <span class="bumper">LB</span>
+      <button class="tab" role="tab" data-nav data-act="view" data-v="1" aria-selected="true">Fileira</button>
+      <button class="tab" role="tab" data-nav data-act="view" data-v="2" aria-selected="false">Prateleiras</button>
+      <button class="tab" role="tab" data-nav data-act="view" data-v="3" aria-selected="false">Painéis</button>
+      <span class="bumper">RB</span>
+    </div>
+    <div class="spacer"></div>
+    <button class="chip round" data-nav data-act="firefox" aria-label="Firefox">
+      <svg class="svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg>
+    </button>
+    <button class="chip" data-nav data-act="party" aria-label="Party do Discord">
+      <span class="stack" id="partyStack"></span>
+      <span id="partyChipTxt">4 na call</span>
+      <svg class="svg" id="partyMicIco" viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>
+    </button>
+    <button class="chip" data-nav data-act="audio" aria-label="Áudio">
+      <svg class="svg" viewBox="0 0 24 24"><path d="M4 15v-3a8 8 0 0 1 16 0v3"/><rect x="3" y="14" width="4" height="6" rx="1.5"/><rect x="17" y="14" width="4" height="6" rx="1.5"/></svg>
+      <span id="audioChipTxt">FOSI K5</span>
+    </button>
+    <span class="clock" id="clock"></span>
+  </header>
+
+  <main class="main" id="main">
+    <!-- Conceito 1 -->
+    <section class="view inner" id="v1" data-view="1">
+      <div class="hero-info">
+        <span class="pill" id="h-src">Steam</span>
+        <h1 class="h-title" id="h-title"></h1>
+        <p class="h-meta" id="h-meta"></p>
+        <div class="btns">
+          <button class="btn play" data-nav data-act="launch" id="h-play"><span class="g a">A</span>Jogar</button>
+          <button class="btn" data-nav data-act="details" id="h-details">Detalhes</button>
+        </div>
+      </div>
+      <div class="row" id="v1-row"></div>
+    </section>
+
+    <!-- Conceito 2 -->
+    <section class="view inner" id="v2" data-view="2" hidden></section>
+
+    <!-- Conceito 3 -->
+    <section class="view inner" id="v3" data-view="3" hidden></section>
+  </main>
+
+  <footer class="hints inner" id="hints">
+    <span class="pad" id="padStatus"><span class="dot"></span><span id="padTxt">Teclado e mouse</span></span>
+    <span class="hint"><span class="g a">A</span><span id="hintA">Jogar</span></span>
+    <span class="hint"><span class="g b">B</span>Voltar</span>
+    <span class="hint"><span class="g y">Y</span>Party</span>
+    <span class="hint"><span class="g x">X</span>Áudio</span>
+    <span class="hint"><span class="bumper">LB</span><span class="bumper">RB</span>Trocar conceito</span>
+    <span class="example">Dados de exemplo</span>
+  </footer>
+</div>
+
+<div class="bd" id="bd"><div class="bd-l on" id="bdA"></div><div class="bd-l" id="bdB"></div><div class="bd-scrim"></div></div>
+
+<div class="veil" id="veil" hidden></div>
+
+<aside class="sheet" id="party" hidden aria-label="Party do Discord">
+  <h3>Party</h3>
+  <p class="sub">Discord · canal Squad do CS</p>
+  <div class="members" id="partyMembers"></div>
+  <div class="grp">Você</div>
+  <button class="opt" data-nav data-act="mute" id="optMute" aria-pressed="false">Mutar microfone<small>Y duas vezes</small></button>
+  <button class="opt" data-nav data-act="deaf" id="optDeaf" aria-pressed="false">Ensurdecer</button>
+  <button class="opt danger" data-nav data-act="leave">Sair da call</button>
+  <div class="grp">Discord</div>
+  <button class="opt" data-nav data-act="discord">Abrir Discord completo<small>chat e servidores</small></button>
+</aside>
+
+<aside class="sheet" id="audio" hidden aria-label="Áudio">
+  <h3>Áudio</h3>
+  <p class="sub">Pelo AudioHub</p>
+  <div class="grp">Saída</div>
+  <div id="outs" style="display:grid;gap:10px"></div>
+  <div class="grp">Preset de EQ</div>
+  <div class="presets" id="presets"></div>
+</aside>
+
+<div class="modal" id="launch" hidden role="dialog" aria-label="Iniciando jogo">
+  <div class="m-art" id="m-art"></div>
+  <div class="m-body">
+    <h3 id="m-title"></h3>
+    <p id="m-txt"></p>
+    <div class="prog" id="m-prog"><i></i></div>
+    <button class="btn" data-nav data-act="close" id="m-ok">Voltar ao hub</button>
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(() => {
+"use strict";
+const $ = (s, r = document) => r.querySelector(s);
+
+/* ---------------- dados de exemplo ---------------- */
+const SRC = { steam: "Steam", epic: "Epic", exe: ".exe", ra: "RetroAchievements" };
+const GAMES = [
+  { id:"cs2", t:"Counter-Strike 2", src:"steam", h:1284, last:"Hoje, 01:12", rank:0, c:["#1B2735","#3E5A73","#E8A33A"], s:1 },
+  { id:"elden", t:"Elden Ring", src:"steam", h:142, ach:[38,42], last:"Ontem", rank:1, c:["#1E1A12","#5A4A2A","#E9C46A"], s:3 },
+  { id:"smw", t:"Super Mario World", src:"ra", plat:"SNES", h:31, ach:[48,96], last:"Sábado", rank:2, c:["#2E6FD0","#69B7F0","#FFD84A"], s:2 },
+  { id:"deadlock", t:"Deadlock", src:"steam", h:212, last:"Quinta", rank:3, c:["#14201D","#2F4F45","#C7E36B"], s:0 },
+  { id:"mc", t:"Minecraft", src:"exe", h:403, last:"Quarta", rank:4, note:"tempo medido pelo hub", c:["#1F3A1F","#4C7A3A","#9BD16B"], s:4 },
+  { id:"fortnite", t:"Fortnite", src:"epic", h:96, last:"Domingo passado", rank:5, c:["#2A1A5E","#5B3FD1","#4FD1FF"], s:5 },
+  { id:"hades2", t:"Hades II", src:"steam", h:61, ach:[29,49], last:"3 semanas", rank:6, c:["#2A0F1F","#7A1F3D","#FF8A5B"], s:0 },
+  { id:"pkem", t:"Pokémon Emerald", src:"ra", plat:"GBA", h:58, ach:[41,93], last:"1 mês", rank:7, c:["#0F3B33","#1F7A63","#7EF0C2"], s:4 },
+  { id:"rl", t:"Rocket League", src:"epic", h:177, last:"1 mês", rank:8, c:["#0F1E3D","#1E5BB8","#FF8C1A"], s:1 },
+  { id:"silksong", t:"Hollow Knight: Silksong", src:"steam", h:37, ach:[12,50], last:"2 meses", rank:9, c:["#2B1416","#6E2A2E","#F2E6D8"], s:3 },
+  { id:"osu", t:"osu!", src:"exe", h:88, last:"2 meses", rank:10, note:"tempo medido pelo hub", c:["#3A0F3F","#C2337A","#FFD1E8"], s:0 },
+  { id:"aw2", t:"Alan Wake 2", src:"epic", h:24, last:"3 meses", rank:11, c:["#0E1418","#22323B","#D9E1E6"], s:1 },
+];
+const BY = Object.fromEntries(GAMES.map(g => [g.id, g]));
+const PARTY = [
+  { n:"Você", c:"#2F5BE0", talk:true },
+  { n:"Rafa", c:"#D9822B" },
+  { n:"Lu", c:"#B5398C", muted:true },
+  { n:"Biel", c:"#2E9C6A" },
+];
+const OUTS = [ { id:"iem", n:"FOSI K5 + Truthear Zero", s:"FOSI K5", k:"IEM" }, { id:"tv", n:"TV Sony Bravia", s:"TV Sony", k:"TV" } ];
+const PRESETS = ["CS","Deadlock","FPS","Imersão","Música","Filme","Discord"];
+const WEEK = [["Seg",1.5],["Ter",0.8],["Qua",2.2],["Qui",3.1],["Sex",1.2],["Sáb",4.0],["Dom",1.5]];
+const EQ = [5,4,2,0,-1,1,3,4,3,2];
+
+const fmtH = n => n.toLocaleString("pt-BR") + " h";
+const srcLabel = g => g.src === "ra" ? "RetroAchievements · " + g.plat : SRC[g.src];
+const achTxt = g => g.ach ? `${g.ach[0]}/${g.ach[1]} conquistas` : g.src === "epic" ? "Conquistas: Epic não informa" : g.src === "exe" ? "Sem conquistas (.exe)" : "Sem conquistas";
+const pct = g => g.ach ? Math.round(g.ach[0] / g.ach[1] * 100) : 0;
+
+/* ---------------- arte gerada (capas ilustrativas) ---------------- */
+function seeded(str){ let h = 2166136261; for (const ch of str) h = Math.imul(h ^ ch.charCodeAt(0), 16777619); return () => ((h = Math.imul(h ^ (h >>> 15), 2246822507) ^ Math.imul(h ^ (h >>> 13), 3266489909)) >>> 0) / 4294967296; }
+function paint(g, w, h){
+  const cv = document.createElement("canvas"); cv.width = w; cv.height = h;
+  const x = cv.getContext("2d"), r = seeded(g.id + w), [c0, c1, c2] = g.c, m = Math.min(w, h);
+  const lg = x.createLinearGradient(0, 0, w * .4, h); lg.addColorStop(0, c1); lg.addColorStop(1, c0);
+  x.fillStyle = lg; x.fillRect(0, 0, w, h);
+  x.save();
+  if (g.s === 0){ // anéis
+    const cx = w * (.55 + r() * .3), cy = h * (.25 + r() * .2);
+    for (let i = 14; i > 0; i--){ x.beginPath(); x.arc(cx, cy, i * m * .07, 0, 7); x.strokeStyle = i % 3 ? "rgba(255,255,255,.08)" : c2; x.globalAlpha = i % 3 ? 1 : .55; x.lineWidth = m * .012; x.stroke(); }
+  } else if (g.s === 1){ // faixas diagonais
+    x.translate(w / 2, h / 2); x.rotate(-.5);
+    for (let i = -12; i < 12; i++){ x.fillStyle = i % 4 === 0 ? c2 : "rgba(0,0,0,.18)"; x.globalAlpha = i % 4 === 0 ? .8 : 1; x.fillRect(i * m * .14, -h * 1.5, m * (i % 4 === 0 ? .03 : .07), h * 3); }
+  } else if (g.s === 2){ // pontos
+    const st = m * .08;
+    for (let yy = st / 2; yy < h; yy += st) for (let xx = st / 2; xx < w; xx += st){ const k = r(); x.globalAlpha = .15 + k * .5; x.fillStyle = k > .82 ? c2 : "#fff"; x.beginPath(); x.arc(xx, yy, st * (.12 + k * .2), 0, 7); x.fill(); }
+  } else if (g.s === 3){ // sol e horizonte
+    const cx = w * .62, cy = h * .42, rad = m * .3;
+    const sg = x.createRadialGradient(cx, cy, 0, cx, cy, rad * 2.4); sg.addColorStop(0, c2); sg.addColorStop(.4, c2 + "55"); sg.addColorStop(1, "transparent");
+    x.fillStyle = sg; x.fillRect(0, 0, w, h);
+    x.beginPath(); x.arc(cx, cy, rad, 0, 7); x.fillStyle = c2; x.globalAlpha = .9; x.fill(); x.globalAlpha = 1;
+    for (let i = 0; i < 9; i++){ x.fillStyle = c0; x.fillRect(0, cy + i * i * m * .006 + i * m * .012, w, m * (.004 + i * .003)); }
+    x.fillStyle = c0; x.fillRect(0, h * .66, w, h);
+  } else if (g.s === 4){ // montanhas
+    for (let L = 0; L < 4; L++){
+      x.beginPath(); x.moveTo(0, h); let px = 0; const base = h * (.38 + L * .14);
+      while (px <= w){ x.lineTo(px, base - r() * m * (.22 - L * .04)); px += m * (.08 + r() * .12); }
+      x.lineTo(w, h); x.closePath(); x.fillStyle = L === 0 ? c2 : c0; x.globalAlpha = L === 0 ? .55 : .35 + L * .18; x.fill();
+    }
+  } else { // blocos
+    for (let i = 0; i < 26; i++){ x.save(); x.translate(r() * w, r() * h); x.rotate((r() - .5) * .6); x.globalAlpha = .12 + r() * .45; x.fillStyle = r() > .7 ? c2 : "#fff"; const s = m * (.05 + r() * .22); x.fillRect(-s / 2, -s / 2, s, s * (.4 + r())); x.restore(); }
+  }
+  x.restore();
+  const vg = x.createLinearGradient(0, h * .45, 0, h); vg.addColorStop(0, "rgba(0,0,0,0)"); vg.addColorStop(1, "rgba(0,0,0,.62)");
+  x.fillStyle = vg; x.fillRect(0, 0, w, h);
+  return cv.toDataURL("image/jpeg", .86);
+}
+const ART = {};
+(() => {
+  let css = "";
+  for (const g of GAMES){ ART[g.id] = { p: paint(g, 360, 540), l: paint(g, 1120, 630) }; css += `.g-${g.id}{--p:url(${ART[g.id].p});--l:url(${ART[g.id].l})}\n`; }
+  const st = document.createElement("style"); st.textContent = css; document.head.appendChild(st);
+})();
+
+/* ---------------- ícones ---------------- */
+const ICO = {
+  globe:'<svg class="svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg>',
+  headset:'<svg class="svg" viewBox="0 0 24 24"><path d="M4 15v-3a8 8 0 0 1 16 0v3"/><rect x="3" y="14" width="4" height="6" rx="1.5"/><rect x="17" y="14" width="4" height="6" rx="1.5"/></svg>',
+  chat:'<svg class="svg" viewBox="0 0 24 24"><path d="M4 5h16v11H9l-5 4z"/></svg>',
+  folder:'<svg class="svg" viewBox="0 0 24 24"><path d="M3 6h6l2 2h10v11H3z"/></svg>',
+  desk:'<svg class="svg" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="12" rx="1.5"/><path d="M9 20h6M12 16v4"/></svg>',
+  grid:'<svg class="svg" viewBox="0 0 24 24"><rect x="4" y="4" width="7" height="7" rx="1"/><rect x="13" y="4" width="7" height="7" rx="1"/><rect x="4" y="13" width="7" height="7" rx="1"/><rect x="13" y="13" width="7" height="7" rx="1"/></svg>',
+  gear:'<svg class="svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"/></svg>',
+  micoff:'<svg class="svg" viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3M3 3l18 18"/></svg>',
+};
+
+/* ---------------- render ---------------- */
+const cover = g => `<button class="card cover g-${g.id}" data-nav data-act="game" data-g="${g.id}" aria-label="${g.t}"><span class="art"></span><span class="src">${SRC[g.src]}</span><span class="cv-title">${g.t}</span></button>`;
+const coverBar = g => `<button class="card cover g-${g.id}" data-nav data-act="game" data-g="${g.id}" aria-label="${g.t}"><span class="art"></span><span class="src">${pct(g)}%</span><span class="cv-title">${g.t}</span><span class="bar"><i style="width:${pct(g)}%"></i></span></button>`;
+const wide = g => `<button class="card wide g-${g.id}" data-nav data-act="game" data-g="${g.id}" aria-label="${g.t}"><span class="art"></span><span class="src">${SRC[g.src]}</span><span class="cv-title">${g.t}</span><span class="cv-sub">${g.last} · ${fmtH(g.h)}</span>${g.ach ? `<span class="bar"><i style="width:${pct(g)}%"></i></span>` : ""}</button>`;
+const app = (ico, act, name, sub) => `<button class="app" data-nav data-act="${act}">${ICO[ico]}<span><b>${name}</b><small>${sub}</small></span></button>`;
+const byRecent = [...GAMES].sort((a, b) => a.rank - b.rank);
+
+$("#totalh").textContent = fmtH(GAMES.reduce((s, g) => s + g.h, 0)) + " jogadas";
+$("#v1-row").innerHTML = byRecent.map(cover).join("") +
+  `<button class="card cover" data-nav data-act="library" aria-label="Biblioteca completa" style="display:grid;place-items:center;background:var(--surface)"><span style="display:grid;justify-items:center;gap:10px;color:var(--ink-2)">${ICO.grid}<b style="color:var(--ink);font-weight:600">Biblioteca</b><small>${GAMES.length} jogos</small></span></button>`;
+
+$("#v2").innerHTML = `
+  <div class="shelf"><h2>Continuar jogando <small>Steam, Epic, .exe e emuladores juntos</small></h2><div class="row">${byRecent.slice(0, 6).map(wide).join("")}</div></div>
+  <div class="shelf"><h2>Biblioteca <small>${GAMES.length} jogos · A–Z</small></h2><div class="row">${[...GAMES].sort((a, b) => a.t.localeCompare(b.t)).map(cover).join("")}</div></div>
+  <div class="shelf"><h2>Perto de completar <small>conquistas Steam e RetroAchievements</small></h2><div class="row">${GAMES.filter(g => g.ach).sort((a, b) => pct(b) - pct(a)).map(coverBar).join("")}</div></div>
+  <div class="shelf"><h2>Apps <small>já abertos em segundo plano, aparecem na hora</small></h2><div class="row">
+    ${app("globe","firefox","Firefox","Pronto · abre na hora")}${app("chat","discord","Discord","Squad do CS · 4 na call")}${app("headset","audio","AudioHub","FOSI K5 · preset CS")}${app("folder","toast:Explorador de arquivos aberto","Arquivos","Explorador do Windows")}${app("desk","toast:No PC real, o hub minimizaria e mostraria a área de trabalho","Área de trabalho","Sair do modo console")}
+  </div></div>`;
+
+const maxW = Math.max(...WEEK.map(d => d[1]));
+const weekTotal = WEEK.reduce((s, d) => s + d[1], 0);
+const cs = BY.cs2;
+$("#v3").innerHTML = `<div class="panels">
+  <button class="tile t-hero g-${cs.id}" data-nav data-act="game" data-g="${cs.id}"><span class="art"></span><span class="label">Continuar · ${SRC[cs.src]}</span><h3>${cs.t}</h3><p>${cs.last} · ${fmtH(cs.h)}</p></button>
+  <button class="tile t-party" data-nav data-act="party"><span class="label">Party · Discord</span><b>Squad do CS</b><div class="members">${PARTY.map(p => `<div class="mem"><i style="background:${p.c}" class="${p.talk ? "talk" : ""}"></i><span>${p.n}</span>${p.muted ? ICO.micoff : ""}</div>`).join("")}</div></button>
+  <button class="tile t-audio" data-nav data-act="audio"><span class="label">Áudio · AudioHub</span><b id="tAudio">FOSI K5 + Truthear Zero</b><div class="eq">${EQ.map(v => `<i style="height:${30 + v * 8}%"></i>`).join("")}</div></button>
+  <button class="tile t-stats" data-nav data-act="toast:Tela de estatísticas: próxima etapa"><span class="label">Esta semana</span><span class="big">${Math.floor(weekTotal)} h ${Math.round(weekTotal % 1 * 60)} min</span><div class="bars">${WEEK.map(d => `<span><i style="height:${Math.round(d[1] / maxW * 40)}px"></i>${d[0]}</span>`).join("")}</div></button>
+  ${byRecent.slice(1, 7).map(g => `<button class="tile t-mini card g-${g.id}" data-nav data-act="game" data-g="${g.id}" aria-label="${g.t}"><span class="art"></span><span class="src">${SRC[g.src]}</span><span class="cv-title">${g.t}</span></button>`).join("")}
+  <button class="tile t-app" data-nav data-act="firefox">${ICO.globe}<b>Firefox</b></button>
+  <button class="tile t-app" data-nav data-act="library">${ICO.grid}<b>Biblioteca completa</b></button>
+  <button class="tile t-app" data-nav data-act="toast:Explorador de arquivos aberto">${ICO.folder}<b>Arquivos</b></button>
+  <button class="tile t-app" data-nav data-act="toast:Configurações: próxima etapa">${ICO.gear}<b>Configurações</b></button>
+</div>`;
+
+/* party + áudio */
+const state = { mute:false, deaf:false, inCall:true, out:"iem", preset:"CS" };
+function renderParty(){
+  $("#partyStack").innerHTML = state.inCall ? PARTY.map(p => `<i style="background:${p.c}"></i>`).join("") : "";
+  $("#partyChipTxt").textContent = state.inCall ? `${PARTY.length} na call` : "Party";
+  $("#partyMicIco").classList.toggle("muted-ico", state.mute || state.deaf);
+  $("#partyMembers").innerHTML = state.inCall ? PARTY.map(p => `<div class="mem"><i style="background:${p.c}" class="${p.talk && !state.mute ? "talk" : ""}"></i><span>${p.n}</span>${(p.n === "Você" ? state.mute || state.deaf : p.muted) ? ICO.micoff : ""}</div>`).join("") : `<p class="sub" style="margin:0">Você não está em nenhuma call.</p>`;
+  $("#optMute").setAttribute("aria-pressed", state.mute); $("#optDeaf").setAttribute("aria-pressed", state.deaf);
+}
+function renderAudio(){
+  $("#outs").innerHTML = OUTS.map(o => `<button class="opt" data-nav data-act="out:${o.id}" aria-pressed="${state.out === o.id}">${o.n}<small>${o.k}</small></button>`).join("");
+  $("#presets").innerHTML = PRESETS.map(p => `<button class="opt" data-nav data-act="preset:${p}" aria-pressed="${state.preset === p}">${p}</button>`).join("");
+  const o = OUTS.find(o => o.id === state.out);
+  $("#audioChipTxt").textContent = o.s;
+  const t = $("#tAudio"); if (t) t.textContent = o.n + " · " + state.preset;
+}
+renderParty(); renderAudio();
+
+/* ---------------- foco e navegação espacial ---------------- */
+let view = 1, cur = null, overlay = null, prevFocus = null;
+const lastInView = {}, lastInRow = new WeakMap();
+const main = $("#main");
+
+function layerEls(){
+  const root = overlay ? [overlay] : [$("#top"), $("#v" + view)];
+  return root.flatMap(r => [...r.querySelectorAll("[data-nav]")]).filter(e => e.offsetParent !== null);
+}
+function focusEl(el, scroll = true){
+  if (!el) return;
+  if (cur) cur.classList.remove("f");
+  cur = el; el.classList.add("f"); el.focus({ preventScroll:true });
+  if (!overlay) lastInView[view] = el;
+  const row = el.closest(".row"); if (row) lastInRow.set(row, el);
+  if (scroll) reveal(el);
+  document.querySelectorAll(".shelf.cur").forEach(s => s.classList.remove("cur"));
+  el.closest(".shelf")?.classList.add("cur");
+  onFocus(el);
+}
+function reveal(el){
+  const smooth = matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth";
+  const row = el.closest(".row");
+  if (row){
+    const pad = Math.min(120, row.clientWidth * .1), a = el.offsetLeft, b = a + el.offsetWidth;
+    let L = row.scrollLeft;
+    if (a < L + pad) L = a - pad; else if (b > L + row.clientWidth - pad) L = b - row.clientWidth + pad;
+    if (L !== row.scrollLeft) row.scrollTo({ left: Math.max(0, L), behavior: smooth });
+  }
+  if (overlay) return;
+  const box = (el.closest(".shelf") || el).getBoundingClientRect(), m = main.getBoundingClientRect(), pad = 12;
+  if (el.closest("#top")) return;
+  if (box.top < m.top + pad) main.scrollBy({ top: box.top - m.top - pad, behavior: smooth });
+  else if (box.bottom > m.bottom - pad) main.scrollBy({ top: box.bottom - m.bottom + pad, behavior: smooth });
+}
+function move(dir){
+  const els = layerEls();
+  if (!cur || !els.includes(cur)) return focusEl(els[0]);
+  const c = cur.getBoundingClientRect(), ccx = c.left + c.width / 2, ccy = c.top + c.height / 2;
+  let best = null, bestScore = Infinity;
+  for (const el of els){
+    if (el === cur) continue;
+    const r = el.getBoundingClientRect(), cx = r.left + r.width / 2, cy = r.top + r.height / 2;
+    let prim, ortho, overlap;
+    if (dir === "right"){ if (cx <= ccx + 2 || r.left < c.left + 2) continue; prim = Math.max(0, r.left - c.right); ortho = Math.abs(cy - ccy); overlap = Math.min(c.bottom, r.bottom) - Math.max(c.top, r.top); }
+    else if (dir === "left"){ if (cx >= ccx - 2 || r.right > c.right - 2) continue; prim = Math.max(0, c.left - r.right); ortho = Math.abs(cy - ccy); overlap = Math.min(c.bottom, r.bottom) - Math.max(c.top, r.top); }
+    else if (dir === "down"){ if (cy <= ccy + 2 || r.top < c.top + 2) continue; prim = Math.max(0, r.top - c.bottom); ortho = Math.abs(cx - ccx); overlap = Math.min(c.right, r.right) - Math.max(c.left, r.left); }
+    else { if (cy >= ccy - 2 || r.bottom > c.bottom - 2) continue; prim = Math.max(0, c.top - r.bottom); ortho = Math.abs(cx - ccx); overlap = Math.min(c.right, r.right) - Math.max(c.left, r.left); }
+    const score = prim + (overlap > 0 ? ortho * .3 : ortho * 1.2 + 4000);
+    if (score < bestScore){ bestScore = score; best = el; }
+  }
+  if (!best) return;
+  // memória por fileira: ao entrar numa fileira de cima/baixo, volta ao último item focado nela (se visível)
+  const toRow = best.closest(".row");
+  if ((dir === "up" || dir === "down") && toRow && toRow !== cur.closest(".row")){
+    const rem = lastInRow.get(toRow);
+    if (rem){ const rr = rem.getBoundingClientRect(), br = toRow.getBoundingClientRect(); if (rr.left >= br.left - 4 && rr.right <= br.right + 4) best = rem; }
+  }
+  focusEl(best);
+}
+
+/* fundo do conceito 1 */
+let bdOn = "A", bdTimer = 0, heroGame = null;
+function setHero(g){
+  if (heroGame === g) return; heroGame = g;
+  $("#h-src").textContent = srcLabel(g);
+  $("#h-title").textContent = g.t;
+  $("#h-meta").innerHTML = `<span><b>${fmtH(g.h)}</b> jogadas</span><span>Última sessão: <b>${g.last}</b></span><span>${achTxt(g)}</span>${g.note ? `<span>${g.note}</span>` : ""}`;
+  $("#h-play").dataset.g = g.id; $("#h-details").dataset.g = g.id;
+  clearTimeout(bdTimer);
+  bdTimer = setTimeout(() => {
+    const next = bdOn === "A" ? "B" : "A";
+    $("#bd" + next).style.backgroundImage = `url(${ART[g.id].l})`;
+    $("#bd" + next).classList.add("on"); $("#bd" + bdOn).classList.remove("on"); bdOn = next;
+  }, 70);
+}
+function onFocus(el){
+  const g = el.dataset.g && BY[el.dataset.g];
+  if (view === 1 && g && el.closest("#v1-row")) setHero(g);
+  const act = el.dataset.act || "";
+  $("#hintA").textContent = act === "game" || act === "launch" ? "Jogar" : act === "view" ? "Trocar" : act.startsWith("out") || act.startsWith("preset") || act === "mute" || act === "deaf" ? "Escolher" : "Abrir";
+}
+
+function setView(v, focus = true){
+  v = ((v - 1 + 3) % 3) + 1; view = v;
+  for (let i = 1; i <= 3; i++) $("#v" + i).hidden = i !== v;
+  document.querySelectorAll(".tab").forEach(t => t.setAttribute("aria-selected", t.dataset.v == v));
+  $("#bd").hidden = v !== 1;
+  main.scrollTop = 0;
+  try { localStorage.setItem("hubos-view", v); } catch (e) {}
+  if (focus){
+    const keep = cur && cur.closest("#top");
+    focusEl(keep ? cur : (lastInView[v] && !lastInView[v].closest("#top") ? lastInView[v] : $("#v" + v + " [data-nav]")), !keep);
+  }
+}
+
+/* ---------------- overlays ---------------- */
+function openOverlay(el){
+  if (overlay) closeOverlay(true);
+  prevFocus = cur; overlay = el; el.hidden = false; $("#veil").hidden = false;
+  requestAnimationFrame(() => requestAnimationFrame(() => { el.classList.add("open"); $("#veil").classList.add("open"); }));
+  focusEl(el.querySelector('[aria-pressed="true"]') || el.querySelector("[data-nav]"), false);
+}
+function closeOverlay(instant){
+  if (!overlay) return;
+  const el = overlay; overlay = null;
+  el.classList.remove("open"); $("#veil").classList.remove("open");
+  const done = () => { if (!el.classList.contains("open")) el.hidden = true; if (!overlay) $("#veil").hidden = true; };
+  instant ? done() : setTimeout(done, 300);
+  clearTimeout(launchTimer);
+  if (prevFocus) focusEl(prevFocus, false);
+}
+let launchTimer = 0;
+function launch(g){
+  $("#m-art").style.backgroundImage = `url(${ART[g.id].l})`;
+  $("#m-title").textContent = g.t;
+  $("#m-txt").textContent = `Abrindo pela ${g.src === "ra" ? "RetroArch (" + g.plat + ")" : g.src === "exe" ? "executável direto" : SRC[g.src]}, em tela cheia…`;
+  const pr = $("#m-prog"); pr.classList.remove("run"); void pr.offsetWidth; pr.classList.add("run");
+  openOverlay($("#launch"));
+  clearTimeout(launchTimer);
+  launchTimer = setTimeout(() => { $("#m-txt").textContent = "Em jogo. No PC de verdade o hub sairia da frente agora. Guide, Alt+Tab ou Ctrl+Alt+H trazem ele de volta, com a sessão sendo cronometrada."; }, 1700);
+}
+
+let toastT = 0;
+function toast(msg){ const t = $("#toast"); t.textContent = msg; t.classList.add("show"); clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove("show"), 2600); }
+
+function activate(el){
+  if (!el) return;
+  const act = el.dataset.act || "", g = el.dataset.g && BY[el.dataset.g];
+  if (act === "game" || act === "launch") return launch(g || heroGame);
+  if (act === "details") return toast(`Detalhes de ${(g || heroGame).t}: próxima etapa do desenho`);
+  if (act === "view") return setView(+el.dataset.v);
+  if (act === "party") return openOverlay($("#party"));
+  if (act === "audio") return openOverlay($("#audio"));
+  if (act === "close") return closeOverlay();
+  if (act === "firefox") return toast("Firefox trazido para frente: já estava aberto, 0 s de espera");
+  if (act === "discord") return toast("Discord completo trazido para frente (pré-aberto em segundo plano)");
+  if (act === "library") return toast("Biblioteca completa: próxima etapa do desenho");
+  if (act === "profile") return toast("Perfil: próxima etapa do desenho");
+  if (act === "mute"){ state.mute = !state.mute; renderParty(); return toast(state.mute ? "Microfone mutado" : "Microfone ligado"); }
+  if (act === "deaf"){ state.deaf = !state.deaf; renderParty(); return toast(state.deaf ? "Áudio da call desligado" : "Áudio da call ligado"); }
+  if (act === "leave"){ state.inCall = false; renderParty(); closeOverlay(); return toast("Você saiu da call"); }
+  if (act.startsWith("out:")){ state.out = act.slice(4); renderAudio(); focusEl($(`#outs [data-act="${act}"]`), false); return toast("Saída trocada pelo AudioHub"); }
+  if (act.startsWith("preset:")){ state.preset = act.slice(7); renderAudio(); focusEl($(`#presets [data-act="${act}"]`), false); return toast(`Preset ${state.preset} aplicado`); }
+  if (act.startsWith("toast:")) return toast(act.slice(6));
+}
+function back(){ if (overlay) closeOverlay(); }
+
+/* ---------------- entrada: mouse ---------------- */
+let lastPX = -1, lastPY = -1;
+document.addEventListener("pointermove", e => {
+  if (e.clientX === lastPX && e.clientY === lastPY) return; lastPX = e.clientX; lastPY = e.clientY;
+  const el = e.target.closest("[data-nav]");
+  if (el && el !== cur && layerEls().includes(el)) focusEl(el, false);
+});
+document.addEventListener("click", e => {
+  const el = e.target.closest("[data-nav]");
+  if (el && layerEls().includes(el)){ focusEl(el, false); activate(el); }
+});
+$("#veil").addEventListener("click", () => closeOverlay());
+
+/* ---------------- entrada: teclado ---------------- */
+const KEYS = { ArrowRight:"right", ArrowLeft:"left", ArrowUp:"up", ArrowDown:"down" };
+document.addEventListener("keydown", e => {
+  if (KEYS[e.key]){ e.preventDefault(); return move(KEYS[e.key]); }
+  if (e.key === "Enter" || e.key === " "){ e.preventDefault(); return activate(cur); }
+  if (e.key === "Escape" || e.key === "Backspace"){ e.preventDefault(); return back(); }
+  if (e.key === "q" || e.key === "Q" || e.key === "PageUp"){ if (!overlay) setView(view - 1); return; }
+  if (e.key === "e" || e.key === "E" || e.key === "PageDown"){ if (!overlay) setView(view + 1); return; }
+  if (e.key === "Tab"){ e.preventDefault(); return move(e.shiftKey ? "left" : "right"); }
+});
+
+/* ---------------- entrada: controle Xbox (Gamepad API) ---------------- */
+const padTxt = $("#padTxt"), padBox = $("#padStatus");
+let polling = false;
+const held = {}, btnPrev = [];
+function dirFire(dir, on, t){
+  const h = held[dir];
+  if (!on){ held[dir] = null; return; }
+  if (!h){ held[dir] = { t0:t, next:t + 360 }; move(dir); return; }
+  if (t >= h.next){ move(dir); const age = t - h.t0; h.next = t + (age > 1400 ? 55 : 95); }
+}
+function poll(t){
+  let pads = [];
+  try { pads = navigator.getGamepads ? [...navigator.getGamepads()] : []; }
+  catch (e){ padTxt.textContent = "Controle bloqueado nesta janela"; polling = false; return; }
+  const p = pads.find(Boolean);
+  if (!p){ polling = false; padBox.classList.remove("on"); padTxt.textContent = "Teclado e mouse"; return; }
+  padBox.classList.add("on"); padTxt.textContent = "Controle conectado";
+  if (!document.hidden){
+    const b = i => !!(p.buttons[i] && p.buttons[i].pressed), ax = i => p.axes[i] || 0;
+    dirFire("up", b(12) || ax(1) < -.55, t); dirFire("down", b(13) || ax(1) > .55, t);
+    dirFire("left", b(14) || ax(0) < -.55, t); dirFire("right", b(15) || ax(0) > .55, t);
+    const edge = i => { const v = b(i), was = btnPrev[i]; btnPrev[i] = v; return v && !was; };
+    if (edge(0)) activate(cur);
+    if (edge(1)) back();
+    if (edge(2)) overlay && overlay.id === "audio" ? closeOverlay() : openOverlay($("#audio"));
+    if (edge(3)) overlay && overlay.id === "party" ? closeOverlay() : openOverlay($("#party"));
+    if (edge(4) && !overlay) setView(view - 1);
+    if (edge(5) && !overlay) setView(view + 1);
+  }
+  requestAnimationFrame(poll);
+}
+function startPoll(){ if (!polling){ polling = true; requestAnimationFrame(poll); } }
+addEventListener("gamepadconnected", startPoll);
+addEventListener("gamepaddisconnected", () => { padBox.classList.remove("on"); padTxt.textContent = "Teclado e mouse"; });
+try { if (navigator.getGamepads && [...navigator.getGamepads()].some(Boolean)) startPoll(); } catch (e) {}
+
+/* ---------------- relógio e início ---------------- */
+const clock = () => $("#clock").textContent = new Date().toLocaleTimeString("pt-BR", { hour:"2-digit", minute:"2-digit" });
+clock(); setInterval(clock, 15000);
+setHero(byRecent[0]);
+let startV = 1; try { startV = +localStorage.getItem("hubos-view") || 1; } catch (e) {}
+setView(startV, false);
+focusEl($("#v" + view + " [data-nav]"), false);
+})();
+</script>
