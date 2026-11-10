@@ -22,7 +22,7 @@ export const GameCard = memo(function GameCard({ game, onOpen }: Props) {
     >
       {/* Título por baixo: aparece se a imagem não existir ou não carregar. */}
       <span className="cover-fallback">{game.title}</span>
-      <Img className="cover-img" sources={coverSources(game)} alt="" />
+      <Img key={game.coverPath ?? ""} className="cover-img" sources={coverSources(game)} alt="" />
       <span className="src-tag">{game.installed ? SOURCE_LABEL[game.source] : `Baixar · ${SOURCE_LABEL[game.source]}`}</span>
     </button>
   );

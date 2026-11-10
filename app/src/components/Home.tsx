@@ -8,14 +8,16 @@ interface Props {
   games: Game[];
   onPlay: (g: Game) => void;
   onDetails: (g: Game) => void;
+  onCover: (g: Game) => void;
   onFocusGame: (g: Game) => void;
   /** Faixa "Em jogo agora", quando houver jogo aberto. */
   banner?: ReactNode;
 }
 
 /** Tela inicial no conceito "Fileira": jogo em destaque + uma linha de capas. */
-export function Home({ games, onPlay, onDetails, onFocusGame, banner }: Props) {
-  const [hero, setHero] = useState<Game | null>(games[0] ?? null);
+export function Home({ games, onPlay, onDetails, onCover, onFocusGame, banner }: Props) {
+  const [heroId, setHeroId] = useState<string | null>(games[0]?.id ?? null);
+  const hero = games.find((g) => g.id === heroId) ?? games[0] ?? null;
 
   // O destaque acompanha a capa focada na fileira.
   useEffect(() => {
@@ -24,7 +26,7 @@ export function Home({ games, onPlay, onDetails, onFocusGame, banner }: Props) {
       const id = el.dataset.game;
       const g = id && el.closest("[data-nav-row]") ? byId.get(id) : undefined;
       if (g) {
-        setHero(g);
+        setHeroId(g.id);
         onFocusGame(g);
       }
     });
@@ -47,14 +49,14 @@ export function Home({ games, onPlay, onDetails, onFocusGame, banner }: Props) {
     <section className="home">
       <div className="hero-col">
         {banner}
-        {hero && <HeroInfo game={hero} onPlay={onPlay} onDetails={onDetails} />}
+        {hero && <HeroInfo game={hero} onPlay={onPlay} onDetails={onDetails} onCover={onCover} />}
       </div>
       <Row games={games} onOpen={onPlay} />
     </section>
   );
 }
 
-function HeroInfo({ game, onPlay, onDetails }: { game: Game; onPlay: (g: Game) => void; onDetails: (g: Game) => void }) {
+function HeroInfo({ game, onPlay, onDetails, onCover }: { game: Game; onPlay: (g: Game) => void; onDetails: (g: Game) => void; onCover: (g: Game) => void }) {
   return (
     <div className="hero-info">
       <span className="pill">{SOURCE_LABEL[game.source]}</span>
@@ -74,6 +76,10 @@ function HeroInfo({ game, onPlay, onDetails }: { game: Game; onPlay: (g: Game) =
         </button>
         <button className="btn" data-nav onClick={() => onDetails(game)}>
           Detalhes
+        </button>
+        <button className="btn" data-nav onClick={() => onCover(game)}>
+          <span className="g x">X</span>
+          Trocar capa
         </button>
       </div>
     </div>

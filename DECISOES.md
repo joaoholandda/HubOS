@@ -74,4 +74,5 @@
 | 55 | Adicionar .exe | DECIDIDO (padrão proposto) | Escolher arquivo, nome automático, capa entre opções, argumentos | 2026-11-10 |
 | 56 | Primeira configuração | DECIDIDO (padrão proposto) | 6 passos: boas-vindas, restaurar backup, contas, pastas, aparência, pronto | 2026-11-10 |
 | 57 | Abertura, erros, emuladores | DECIDIDO (padrão proposto) | Splash curto; avisos de offline/Steam fora/jogo não abriu; emulador por console em Biblioteca | 2026-11-10 |
+| 58 | Busca de capas | DECIDIDO | SteamGridDB dentro do hub (grade de opções, chave grátis do usuário). Sem Google Imagens | 2026-11-10 |
 | 8 | Firefox / apps instantâneos | DECIDIDO | Mantém o app aberto e escondido; ao clicar, só traz a janela para frente | 2026-11-10 |

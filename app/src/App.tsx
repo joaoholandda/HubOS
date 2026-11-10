@@ -7,6 +7,7 @@ import { Backdrop } from "./components/Backdrop";
 import { Drawer, type MenuItem } from "./components/Drawer";
 import { Home } from "./components/Home";
 import { NowPlaying } from "./components/NowPlaying";
+import { CoverPicker } from "./components/CoverPicker";
 import { TopBar } from "./components/TopBar";
 import { useToast } from "./components/Toast";
 
@@ -17,8 +18,13 @@ export default function App() {
   const [drawer, setDrawer] = useState(false);
   const [pad, setPad] = useState(false);
   const [running, setRunning] = useState<RunningGame | null>(null);
+  const [coverFor, setCoverFor] = useState<Game | null>(null);
+  const coverOpen = useRef(false);
+  coverOpen.current = !!coverFor;
   const [toastNode, toast] = useToast();
   const mainRef = useRef<HTMLElement>(null);
+  const libRef = useRef<Library | null>(null);
+  libRef.current = lib;
 
   useEffect(() => {
     getLibrary()
@@ -56,8 +62,18 @@ export default function App() {
   }, [lib]);
 
   const onAction = useCallback((a: Action) => {
+    if (coverOpen.current) {
+      if (a === "back") setCoverFor(null);
+      return;
+    }
     if (a === "menu") setDrawer((d) => !d);
     if (a === "back") setDrawer(false);
+    // X no controle: trocar a capa do jogo focado.
+    if (a === "x") {
+      const id = focusEngine.current?.dataset.game;
+      const g = id ? libRef.current?.games.find((x) => x.id === id) : undefined;
+      if (g) setCoverFor(g);
+    }
   }, []);
   useInput(onAction, setPad);
 
@@ -86,6 +102,14 @@ export default function App() {
     [toast],
   );
   const closeDrawer = useCallback(() => setDrawer(false), []);
+  const changeCover = useCallback((g: Game, path: string | null) => {
+    if (path === null) {
+      // Voltou à capa original: relê a biblioteca para pegar o caminho da loja.
+      getLibrary().then(setLib).catch(() => {});
+      return;
+    }
+    setLib((l) => (l ? { ...l, games: l.games.map((x) => (x.id === g.id ? { ...x, coverPath: path } : x)) } : l));
+  }, []);
 
   const games = lib?.games ?? [];
   const runningGame = running ? games.find((g) => g.id === running.id) : undefined;
@@ -111,10 +135,11 @@ export default function App() {
         ) : !lib ? (
           <div className="loading" aria-label="Carregando jogos" />
         ) : (
-          <Home games={games} onPlay={play} onDetails={details} onFocusGame={setFocused} banner={banner} />
+          <Home games={games} onPlay={play} onDetails={details} onCover={setCoverFor} onFocusGame={setFocused} banner={banner} />
         )}
       </main>
       <Drawer open={drawer} current="home" onPick={pick} onClose={closeDrawer} />
+      {coverFor && <CoverPicker game={coverFor} onClose={() => setCoverFor(null)} onChanged={changeCover} toast={toast} />}
       {toastNode}
     </div>
   );

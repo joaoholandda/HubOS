@@ -67,6 +67,33 @@ export async function hideHub(): Promise<void> {
   if (inTauri) await invoke("hide_hub");
 }
 
+export interface CoverOption {
+  id: number;
+  url: string;
+  thumb: string;
+  width: number;
+  height: number;
+  style: string;
+}
+
+export const hasSgdbKey = async () => (inTauri ? invoke<boolean>("has_sgdb_key") : false);
+export const setSgdbKey = (key: string) => (inTauri ? invoke<void>("set_sgdb_key", { key }) : Promise.resolve());
+
+/** Opções do SteamGridDB. Erros especiais: "NO_KEY" (falta chave) e "BAD_KEY" (chave recusada). */
+export async function coverOptions(g: Game): Promise<CoverOption[]> {
+  if (!inTauri) throw new Error("NO_KEY");
+  return invoke<CoverOption[]>("cover_options", { gameId: g.id, title: g.title });
+}
+
+export const setCover = (g: Game, url: string) => invoke<string>("set_cover", { gameId: g.id, url });
+export const resetCover = (g: Game) => invoke<void>("reset_cover", { gameId: g.id });
+
+/** Abre um site no navegador padrão (Firefox). */
+export async function openUrl(url: string): Promise<void> {
+  if (!inTauri) return void window.open(url, "_blank");
+  await invoke("launch_game", { launch: url });
+}
+
 /** Imagens em ordem de preferência: arquivo local (rápido, offline) e depois internet. */
 export function coverSources(g: Game): string[] {
   return [g.coverPath && local(g.coverPath), g.coverUrl].filter(Boolean) as string[];

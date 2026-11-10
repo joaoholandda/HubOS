@@ -2,6 +2,7 @@
 //! A interface (React) chama os comandos abaixo com `invoke`.
 
 mod console;
+mod covers;
 
 use std::path::PathBuf;
 
@@ -41,6 +42,11 @@ async fn get_library(app: tauri::AppHandle) -> Result<Library, String> {
             }
             None => warnings.push("Steam não encontrada neste PC.".into()),
         }
+        // Capas que você escolheu no SteamGridDB.
+        if let Ok(dir) = covers::covers_dir(&app) {
+            let _ = app.asset_protocol_scope().allow_directory(&dir, false);
+        }
+        covers::apply_overrides(&app, &mut games);
         Library { games, steam_root: root.map(|p| p.to_string_lossy().into_owned()), warnings }
     })
     .await
@@ -69,6 +75,34 @@ fn get_game_state(state: tauri::State<console::ConsoleState>) -> console::GameSt
 #[tauri::command]
 fn hide_hub(app: tauri::AppHandle) {
     console::hide_hub(&app);
+}
+
+/// Se já existe chave do SteamGridDB salva.
+#[tauri::command]
+fn has_sgdb_key(app: tauri::AppHandle) -> bool {
+    covers::settings(&app).sgdb_key.is_some()
+}
+
+#[tauri::command]
+fn set_sgdb_key(app: tauri::AppHandle, key: String) -> Result<(), String> {
+    covers::save_key(&app, key)
+}
+
+/// Opções de capa do SteamGridDB para um jogo.
+#[tauri::command]
+async fn cover_options(app: tauri::AppHandle, game_id: String, title: String) -> Result<Vec<hubos_core::sgdb::Grid>, String> {
+    covers::grids(&app, &game_id, &title).await
+}
+
+/// Baixa e aplica a capa escolhida. Devolve o caminho local.
+#[tauri::command]
+async fn set_cover(app: tauri::AppHandle, game_id: String, url: String) -> Result<String, String> {
+    covers::set_cover(&app, &game_id, &url).await
+}
+
+#[tauri::command]
+fn reset_cover(app: tauri::AppHandle, game_id: String) -> Result<(), String> {
+    covers::reset_cover(&app, &game_id)
 }
 
 /// Onde a Steam está instalada. `HUBOS_STEAM_DIR` força uma pasta (útil para testes).
@@ -144,7 +178,7 @@ pub fn run() {
                 .build(),
         )
         .manage(console::ConsoleState::default())
-        .invoke_handler(tauri::generate_handler![get_library, launch_game, get_game_state, hide_hub])
+        .invoke_handler(tauri::generate_handler![get_library, launch_game, get_game_state, hide_hub, has_sgdb_key, set_sgdb_key, cover_options, set_cover, reset_cover])
         .setup(move |app| {
             // Em desenvolvimento, abre em janela para não prender a tela.
             #[cfg(debug_assertions)]
