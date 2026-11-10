@@ -51,14 +51,31 @@ pub fn all_sessions(app: &AppHandle) -> Vec<Session> {
     hubos_core::sessions::parse(&text)
 }
 
-/// Jogos .exe no formato da biblioteca. As horas vêm das sessões do hub.
-pub fn library_games(app: &AppHandle) -> Vec<Game> {
+/// Tempo medido pelo hub por jogo: (segundos, fim da última sessão).
+pub fn session_times(app: &AppHandle) -> HashMap<String, (u64, u64)> {
     let mut time: HashMap<String, (u64, u64)> = HashMap::new();
     for s in all_sessions(app) {
         let e = time.entry(s.game.clone()).or_default();
         e.0 += s.seconds();
         e.1 = e.1.max(s.end);
     }
+    time
+}
+
+/// Para origens que não informam horas (Xbox, .exe), usa o que o hub mediu.
+pub fn fill_measured_time(app: &AppHandle, games: &mut [Game]) {
+    let time = session_times(app);
+    for g in games.iter_mut().filter(|g| g.playtime_minutes.is_none()) {
+        if let Some((secs, last)) = time.get(&g.id) {
+            g.playtime_minutes = Some(secs / 60);
+            g.last_played = Some(*last as i64);
+        }
+    }
+}
+
+/// Jogos .exe no formato da biblioteca. As horas vêm das sessões do hub.
+pub fn library_games(app: &AppHandle) -> Vec<Game> {
+    let time = session_times(app);
     games(app)
         .into_iter()
         .map(|g| {

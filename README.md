@@ -28,11 +28,23 @@ npm run tauri dev
 - `app/src-tauri`: lado Rust do app (comandos chamados pela interface).
 - `app/src`: interface em React. `nav/` tem o motor de foco e a entrada (teclado, mouse, controle).
 
-## O que tem aqui hoje
+## O que já funciona (alfa)
+
+- **Biblioteca unificada**: Steam (lida do disco, todos os discos), app Xbox no PC e jogos `.exe` que você adiciona.
+- **Início** (fileira de capas com fundo do jogo), **Jogos** (filtros, ordem, busca) e **Detalhes** (números, sessões).
+- **Comportamento de console**: abre com o Windows em tela cheia, Ctrl+Alt+H mostra/esconde, botão Guide traz o hub, o hub sai da frente quando o jogo abre e volta quando fecha.
+- **Sessões medidas pelo hub** (início, fim, duração) e **Estatísticas** por período.
+- **Voltar ao jogo / Fechar jogo**, **Energia** (suspender, reiniciar, desligar, bloquear) e **Área de trabalho**.
+- **Apps**: programas e sites de acesso rápido.
+- **Capas** pelo SteamGridDB (chave grátis, colada uma vez).
+- **Configurações**: tema, cor de destaque, abrir com o Windows.
+
+Ainda não: Party do Discord, Spotify, AudioHub, Loja, Downloads, Perfil, Notificações e RetroAchievements (desenhados no protótipo).
+
+## Outros arquivos
 
 - `DECISOES.md`: todas as decisões de UX/UI e de arquitetura, uma por linha, com data.
-- `prototipos/home-v2.html`: protótipo navegável de todas as telas (abre direto no navegador; funciona com mouse, teclado e controle Xbox).
-- `prototipos/home-conceitos.html`: os 3 conceitos de home comparados no início (escolhido: Fileira).
+- `prototipos/home-v2.html`: protótipo navegável de todas as telas (referência de desenho; o visual final é o do app).
 
 ## Stack decidida
 

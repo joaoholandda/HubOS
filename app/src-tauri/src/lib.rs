@@ -5,6 +5,7 @@ mod console;
 mod covers;
 mod custom;
 mod system;
+mod xbox;
 
 use std::path::PathBuf;
 
@@ -44,7 +45,13 @@ async fn get_library(app: tauri::AppHandle) -> Result<Library, String> {
             }
             None => warnings.push("Steam não encontrada neste PC.".into()),
         }
+        match xbox::scan(&app) {
+            Ok(found) => games.extend(found),
+            Err(e) => warnings.push(format!("Xbox: {e}")),
+        }
         games.extend(custom::library_games(&app));
+        custom::fill_measured_time(&app, &mut games);
+        games.sort_by(|a, b| b.last_played.unwrap_or(0).cmp(&a.last_played.unwrap_or(0)).then_with(|| a.title.cmp(&b.title)));
         // Capas que você escolheu no SteamGridDB.
         if let Ok(dir) = covers::covers_dir(&app) {
             let _ = app.asset_protocol_scope().allow_directory(&dir, false);
@@ -64,6 +71,9 @@ fn launch_game(app: tauri::AppHandle, id: String, launch: String) -> Result<(), 
         let args = custom::games(&app).into_iter().find(|g| g.id == id).map(|g| g.args).unwrap_or_default();
         return console::spawn_exe(&app, &id, &launch, &args);
     }
+    if id.starts_with("xbox:") {
+        return xbox::launch(&app, &id, &launch);
+    }
     open_target(&app, &launch)
 }
 
@@ -80,9 +90,17 @@ fn open_external(app: tauri::AppHandle, target: String) -> Result<(), String> {
 
 /// Fecha o jogo aberto. `install_dir` é a pasta do jogo (para os da Steam).
 #[tauri::command]
-fn close_game(state: tauri::State<console::ConsoleState>, install_dir: Option<String>) -> Result<(), String> {
+fn close_game(app: tauri::AppHandle, state: tauri::State<console::ConsoleState>, install_dir: Option<String>) -> Result<(), String> {
     if let Some(pid) = *state.1.lock().unwrap() {
         return system::kill_pid(pid);
+    }
+    // Jogos do Xbox: pelo nome do executável.
+    let running = state.0.lock().unwrap().running.as_ref().map(|r| r.id.clone());
+    if let Some(exe) = running.as_deref().filter(|id| id.starts_with("xbox:")).and_then(|id| xbox::exe_of(&app, id)) {
+        return match system::kill_by_name(&exe)? {
+            0 => Err("Não achei o processo do jogo. Feche por dentro dele.".into()),
+            _ => Ok(()),
+        };
     }
     match install_dir {
         Some(dir) => match system::kill_in_dir(&dir)? {
@@ -313,6 +331,7 @@ pub fn run() {
                 .build(),
         )
         .manage(console::ConsoleState::default())
+        .manage(xbox::XboxState::default())
         .invoke_handler(tauri::generate_handler![get_library, launch_game, open_external, close_game, power, add_exe_game, remove_game, rename_game, get_apps, add_app, remove_app, open_app, get_all_sessions, get_settings, set_setting, get_game_state, hide_hub, get_sessions, has_sgdb_key, set_sgdb_key, cover_options, set_cover, reset_cover])
         .setup(move |app| {
             // Em desenvolvimento, abre em janela para não prender a tela.

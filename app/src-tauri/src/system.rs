@@ -74,3 +74,32 @@ pub fn kill_in_dir(dir: &str) -> Result<usize, String> {
     }
     Ok(n)
 }
+
+/// Nome do arquivo do executável de um processo.
+fn exe_name(p: &sysinfo::Process) -> String {
+    p.exe().and_then(|e| e.file_name()).map(|n| n.to_string_lossy().into_owned()).unwrap_or_else(|| std::path::Path::new(p.name()).to_string_lossy().into_owned())
+}
+
+/// Existe algum processo com esse nome de executável?
+pub fn is_running(exe: &str) -> bool {
+    use sysinfo::{ProcessRefreshKind, RefreshKind, System};
+    let sys = System::new_with_specifics(RefreshKind::new().with_processes(ProcessRefreshKind::everything()));
+    sys.processes().values().any(|p| exe_name(p).eq_ignore_ascii_case(exe))
+}
+
+/// Fecha os processos com esse nome de executável.
+pub fn kill_by_name(exe: &str) -> Result<usize, String> {
+    let sys = sysinfo::System::new_all();
+    Ok(sys.processes().values().filter(|p| exe_name(p).eq_ignore_ascii_case(exe) && p.kill()).count())
+}
+
+/// Roda um script do PowerShell escondido e devolve o que ele escreveu.
+pub fn powershell(script: &str) -> Result<String, String> {
+    let out = quiet("powershell").args(["-NoProfile", "-NonInteractive", "-Command", script]).output().map_err(|e| format!("PowerShell não respondeu: {e}"))?;
+    Ok(String::from_utf8_lossy(&out.stdout).into_owned())
+}
+
+/// Abre um app da Microsoft Store pelo endereço `shell:AppsFolder\...`.
+pub fn open_shell(target: &str) -> Result<(), String> {
+    quiet("explorer.exe").arg(target).spawn().map(|_| ()).map_err(|e| format!("Não consegui abrir: {e}"))
+}

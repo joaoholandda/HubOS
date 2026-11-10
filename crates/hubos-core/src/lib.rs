@@ -8,5 +8,6 @@ pub mod sessions;
 pub mod sgdb;
 pub mod steam;
 pub mod vdf;
+pub mod xbox;
 
 pub use model::{Game, Source};

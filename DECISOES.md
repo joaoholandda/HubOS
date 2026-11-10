@@ -79,4 +79,5 @@
 | 60 | Fontes | DECIDIDO | Sora (títulos) + Plus Jakarta Sans (texto) | 2026-11-10 |
 | 61 | Cores | DECIDIDO | NADA de verde. Botão principal monocromático (tinta do tema); ícones do controle só em contorno; capas provisórias em grafite neutro | 2026-11-10 |
 | 62 | Direção visual | DECIDIDO | O mais profissional possível: foco em anel duplo, tipografia ajustada, poucas cores | 2026-11-10 |
+| 63 | Alfa: o que entra | DECIDIDO | Steam, Xbox e .exe na biblioteca; home, Jogos, Detalhes, Apps, Estatísticas, Configurações, Energia; Ctrl+Alt+H e Guide; sessões medidas; capas SteamGridDB. Ficam para depois: Party/Discord, Spotify, AudioHub, Loja, Downloads, Perfil, Notificações, RetroAchievements | 2026-11-10 |
 | 8 | Firefox / apps instantâneos | DECIDIDO | Mantém o app aberto e escondido; ao clicar, só traz a janela para frente | 2026-11-10 |
