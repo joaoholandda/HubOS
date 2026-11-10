@@ -75,4 +75,6 @@
 | 56 | Primeira configuração | DECIDIDO (padrão proposto) | 6 passos: boas-vindas, restaurar backup, contas, pastas, aparência, pronto | 2026-11-10 |
 | 57 | Abertura, erros, emuladores | DECIDIDO (padrão proposto) | Splash curto; avisos de offline/Steam fora/jogo não abriu; emulador por console em Biblioteca | 2026-11-10 |
 | 58 | Busca de capas | DECIDIDO | SteamGridDB dentro do hub (grade de opções, chave grátis do usuário). Sem Google Imagens | 2026-11-10 |
+| 59 | Escala de cantos | DECIDIDO | Só 4 raios: 8px (tags, badges, botões secundários), 14px (capas, menu, botões, campos), 22px (painéis, modais, menu lateral, chips), redondo (avatares, busca, indicadores) | 2026-11-10 |
+| 60 | Fontes | em aberto | Opções: Syne ou Sora (títulos) + DM Sans ou Plus Jakarta Sans (texto) | |
 | 8 | Firefox / apps instantâneos | DECIDIDO | Mantém o app aberto e escondido; ao clicar, só traz a janela para frente | 2026-11-10 |
