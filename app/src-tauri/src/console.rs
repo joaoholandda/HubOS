@@ -31,6 +31,9 @@ struct Session<'a> {
     end: u64,
 }
 
+/// O botão Guide do controle está sendo vigiado? (Para o Diagnóstico.)
+pub static GUIDE_OK: std::sync::atomic::AtomicBool = std::sync::atomic::AtomicBool::new(false);
+
 #[derive(Default)]
 pub struct ConsoleState(pub Mutex<GameState>, pub Mutex<Option<u32>>);
 
@@ -96,7 +99,12 @@ pub fn set_running(app: &AppHandle, id: Option<String>) {
         _ => {}
     }
     if let Some(b) = &before {
-        save_session(app, &b.id, b.started, now());
+        let end = now();
+        crate::log::log(format!("jogo fechou: {} ({} s)", b.id, end.saturating_sub(b.started)));
+        save_session(app, &b.id, b.started, end);
+    }
+    if let Some(id) = &id {
+        crate::log::log(format!("jogo abriu: {id}"));
     }
     cur.running = id.map(|id| RunningGame { id, started: now() });
     let snapshot = cur.clone();
@@ -196,14 +204,17 @@ mod windows {
         let get: GetStateEx = unsafe {
             let module = LoadLibraryW(dll.as_ptr());
             if module.is_null() {
+                crate::log::log("Guide: xinput1_4.dll não carregou");
                 return;
             }
             let f = GetProcAddress(module, 100 as *const u8);
             if f.is_null() {
+                crate::log::log("Guide: função 100 do XInput não existe neste Windows");
                 return;
             }
             std::mem::transmute::<*mut c_void, GetStateEx>(f)
         };
+        super::GUIDE_OK.store(true, std::sync::atomic::Ordering::Relaxed);
         let mut was = [false; 4];
         loop {
             let mut any = false;
@@ -213,6 +224,7 @@ mod windows {
                 any |= ok;
                 let down = ok && st.pad.buttons & GUIDE != 0;
                 if down && !*was {
+                    crate::log::log("Guide apertado: trazendo o hub");
                     super::show_hub(&app);
                 }
                 *was = down;

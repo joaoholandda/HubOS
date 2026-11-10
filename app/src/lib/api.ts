@@ -204,3 +204,43 @@ export function applyAppearance(s: Pick<Settings, "theme" | "accent">) {
   if (s.accent) root.style.setProperty("--accent", s.accent);
   else root.style.removeProperty("--accent");
 }
+
+export interface Diagnostics {
+  version: string;
+  dataDir: string | null;
+  steamRoot: string | null;
+  scan: { steam: number; xbox: number; exe: number; millis: number; warnings: string[] };
+  shortcutOk: boolean;
+  guideOk: boolean;
+  log: string[];
+}
+
+export async function getDiagnostics(): Promise<Diagnostics> {
+  if (inTauri) return invoke<Diagnostics>("get_diagnostics");
+  return { version: "navegador", dataDir: null, steamRoot: null, scan: { steam: MOCK_GAMES.length, xbox: 0, exe: 0, millis: 3, warnings: ["Modo navegador: dados de exemplo."] }, shortcutOk: false, guideOk: false, log: ["[exemplo] HubOS iniciou", "[exemplo] biblioteca lida em 3 ms"] };
+}
+export const openDataDir = () => (inTauri ? invoke<void>("open_data_dir") : Promise.resolve());
+export const openFiles = () => (inTauri ? invoke<void>("open_files") : Promise.resolve());
+
+let mockFavs: string[] = MOCK_GAMES.slice(0, 3).map((g) => g.id);
+export const getFavorites = () => (inTauri ? invoke<string[]>("get_favorites") : Promise.resolve(mockFavs));
+export async function toggleFavorite(id: string): Promise<string[]> {
+  if (inTauri) return invoke<string[]>("toggle_favorite", { id });
+  mockFavs = mockFavs.includes(id) ? mockFavs.filter((x) => x !== id) : [...mockFavs, id];
+  return mockFavs;
+}
+
+export interface Media {
+  title: string;
+  artist: string;
+  app: string;
+  playing: boolean;
+}
+
+let mockMedia: Media | null = { title: "Música de exemplo", artist: "Artista", app: "Spotify", playing: true };
+export const getMedia = () => (inTauri ? invoke<Media | null>("get_media") : Promise.resolve(mockMedia));
+export const mediaArt = () => (inTauri ? invoke<string | null>("media_art") : Promise.resolve(null));
+export async function mediaControl(action: "toggle" | "next" | "prev"): Promise<void> {
+  if (inTauri) return invoke<void>("media_control", { action });
+  if (mockMedia && action === "toggle") mockMedia = { ...mockMedia, playing: !mockMedia.playing };
+}

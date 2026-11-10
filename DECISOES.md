@@ -81,3 +81,8 @@
 | 62 | Direção visual | DECIDIDO | O mais profissional possível: foco em anel duplo, tipografia ajustada, poucas cores | 2026-11-10 |
 | 63 | Alfa: o que entra | DECIDIDO | Steam, Xbox e .exe na biblioteca; home, Jogos, Detalhes, Apps, Estatísticas, Configurações, Energia; Ctrl+Alt+H e Guide; sessões medidas; capas SteamGridDB. Ficam para depois: Party/Discord, Spotify, AudioHub, Loja, Downloads, Perfil, Notificações, RetroAchievements | 2026-11-10 |
 | 8 | Firefox / apps instantâneos | DECIDIDO | Mantém o app aberto e escondido; ao clicar, só traz a janela para frente | 2026-11-10 |
+| 64 | Tocando agora | DECIDIDO | Chip na barra de cima + painel com capa e anterior/tocar/próxima, lendo a mídia do Windows (vale para Spotify, Firefox etc.). Fila e playlists (API do Spotify) ficam para depois | 2026-11-10 |
+| 65 | Favoritos | DECIDIDO | Y no controle (F no teclado) em qualquer capa; estrela na capa; filtro "Favoritos" em Jogos; até 5 na vitrine do Perfil | 2026-11-10 |
+| 66 | Perfil (1ª versão) | DECIDIDO | Só dados locais: resumo, favoritos, recordes e atividade recente. Avatar/banner e níveis Steam/Xbox/RA entram com as contas | 2026-11-10 |
+| 67 | Diagnóstico | DECIDIDO | Configurações › Diagnóstico mostra o que foi achado, se o atalho e o Guide funcionam e o diário (`hubos.log`), com botão de copiar | 2026-11-10 |
+| 68 | Menu: itens provisórios | DECIDIDO | Party abre o Discord, Downloads abre os downloads da Steam, Claude e Arquivos abrem os programas. Loja e Áudio seguem como "em breve" | 2026-11-10 |

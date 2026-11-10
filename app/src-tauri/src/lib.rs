@@ -4,10 +4,14 @@
 mod console;
 mod covers;
 mod custom;
+mod log;
+mod media;
 mod system;
 mod xbox;
 
 use std::path::PathBuf;
+use std::sync::atomic::{AtomicBool, Ordering};
+use std::sync::Mutex;
 
 use hubos_core::{steam, Game};
 use serde::Serialize;
@@ -24,10 +28,28 @@ struct Library {
     warnings: Vec<String>,
 }
 
+/// Ctrl+Alt+H foi registrado? (Outro programa pode já estar usando.)
+static SHORTCUT_OK: AtomicBool = AtomicBool::new(false);
+
+/// Resultado da última leitura da biblioteca, para o Diagnóstico.
+#[derive(Default, Clone, Serialize)]
+#[serde(rename_all = "camelCase")]
+struct LastScan {
+    steam: usize,
+    xbox: usize,
+    exe: usize,
+    millis: u64,
+    warnings: Vec<String>,
+}
+
+#[derive(Default)]
+struct ScanState(Mutex<LastScan>);
+
 /// Lê todas as origens de jogos. Roda fora da thread da interface.
 #[tauri::command]
 async fn get_library(app: tauri::AppHandle) -> Result<Library, String> {
     tauri::async_runtime::spawn_blocking(move || {
+        let began = std::time::Instant::now();
         let mut games = Vec::new();
         let mut warnings = Vec::new();
         let root = find_steam_root();
@@ -57,6 +79,13 @@ async fn get_library(app: tauri::AppHandle) -> Result<Library, String> {
             let _ = app.asset_protocol_scope().allow_directory(&dir, false);
         }
         covers::apply_overrides(&app, &mut games);
+        let count = |p: &str| games.iter().filter(|g| g.id.starts_with(p)).count();
+        let scan = LastScan { steam: count("steam:"), xbox: count("xbox:"), exe: count("exe:"), millis: began.elapsed().as_millis() as u64, warnings: warnings.clone() };
+        log::log(format!("biblioteca lida em {} ms: {} Steam, {} Xbox, {} .exe", scan.millis, scan.steam, scan.xbox, scan.exe));
+        for w in &warnings {
+            log::log(format!("aviso: {w}"));
+        }
+        *app.state::<ScanState>().0.lock().unwrap() = scan;
         Library { games, steam_root: root.map(|p| p.to_string_lossy().into_owned()), warnings }
     })
     .await
@@ -67,14 +96,23 @@ async fn get_library(app: tauri::AppHandle) -> Result<Library, String> {
 /// abrem pela URL `steam://` e são percebidos pelo vigia da Steam.
 #[tauri::command]
 fn launch_game(app: tauri::AppHandle, id: String, launch: String) -> Result<(), String> {
+    let r = launch_inner(&app, &id, &launch);
+    match &r {
+        Ok(()) => log::log(format!("abrir jogo: {id} → {launch}")),
+        Err(e) => log::log(format!("abrir jogo FALHOU: {id} → {launch}: {e}")),
+    }
+    r
+}
+
+fn launch_inner(app: &tauri::AppHandle, id: &str, launch: &str) -> Result<(), String> {
     if id.starts_with("exe:") && launch.to_ascii_lowercase().ends_with(".exe") {
-        let args = custom::games(&app).into_iter().find(|g| g.id == id).map(|g| g.args).unwrap_or_default();
-        return console::spawn_exe(&app, &id, &launch, &args);
+        let args = custom::games(app).into_iter().find(|g| g.id == id).map(|g| g.args).unwrap_or_default();
+        return console::spawn_exe(app, id, launch, &args);
     }
     if id.starts_with("xbox:") {
-        return xbox::launch(&app, &id, &launch);
+        return xbox::launch(app, id, launch);
     }
-    open_target(&app, &launch)
+    open_target(app, launch)
 }
 
 /// Abre uma URL, pasta ou arquivo com o programa padrão.
@@ -91,12 +129,21 @@ fn open_external(app: tauri::AppHandle, target: String) -> Result<(), String> {
 /// Fecha o jogo aberto. `install_dir` é a pasta do jogo (para os da Steam).
 #[tauri::command]
 fn close_game(app: tauri::AppHandle, state: tauri::State<console::ConsoleState>, install_dir: Option<String>) -> Result<(), String> {
+    let r = close_inner(&app, &state, install_dir);
+    match &r {
+        Ok(()) => log::log("fechar jogo: pedido enviado"),
+        Err(e) => log::log(format!("fechar jogo FALHOU: {e}")),
+    }
+    r
+}
+
+fn close_inner(app: &tauri::AppHandle, state: &console::ConsoleState, install_dir: Option<String>) -> Result<(), String> {
     if let Some(pid) = *state.1.lock().unwrap() {
         return system::kill_pid(pid);
     }
     // Jogos do Xbox: pelo nome do executável.
     let running = state.0.lock().unwrap().running.as_ref().map(|r| r.id.clone());
-    if let Some(exe) = running.as_deref().filter(|id| id.starts_with("xbox:")).and_then(|id| xbox::exe_of(&app, id)) {
+    if let Some(exe) = running.as_deref().filter(|id| id.starts_with("xbox:")).and_then(|id| xbox::exe_of(app, id)) {
         return match system::kill_by_name(&exe)? {
             0 => Err("Não achei o processo do jogo. Feche por dentro dele.".into()),
             _ => Ok(()),
@@ -207,6 +254,73 @@ fn set_setting(app: tauri::AppHandle, key: String, value: String) -> Result<(), 
         other => return Err(format!("Configuração desconhecida: {other}")),
     }
     covers::save_settings(&app, &s)
+}
+
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+struct Diagnostics {
+    version: String,
+    data_dir: Option<String>,
+    steam_root: Option<String>,
+    scan: LastScan,
+    shortcut_ok: bool,
+    guide_ok: bool,
+    log: Vec<String>,
+}
+
+/// Tudo que ajuda a entender um problema: o que foi achado e as últimas linhas do diário.
+#[tauri::command]
+fn get_diagnostics(app: tauri::AppHandle) -> Diagnostics {
+    Diagnostics {
+        version: app.package_info().version.to_string(),
+        data_dir: app.path().app_data_dir().ok().map(|p| p.to_string_lossy().into_owned()),
+        steam_root: find_steam_root().map(|p| p.to_string_lossy().into_owned()),
+        scan: app.state::<ScanState>().0.lock().unwrap().clone(),
+        shortcut_ok: SHORTCUT_OK.load(Ordering::Relaxed),
+        guide_ok: console::GUIDE_OK.load(Ordering::Relaxed),
+        log: log::tail(120),
+    }
+}
+
+/// Abre a pasta de dados do hub (diário, sessões, capas) no Explorador.
+#[tauri::command]
+fn open_data_dir(app: tauri::AppHandle) -> Result<(), String> {
+    let dir = app.path().app_data_dir().map_err(|e| e.to_string())?;
+    open_target(&app, &dir.to_string_lossy())
+}
+
+/// Abre o Explorador de Arquivos.
+#[tauri::command]
+fn open_files() -> Result<(), String> {
+    system::start("explorer.exe")
+}
+
+#[tauri::command]
+fn get_favorites(app: tauri::AppHandle) -> Vec<String> {
+    custom::favorites(&app)
+}
+
+#[tauri::command]
+fn toggle_favorite(app: tauri::AppHandle, id: String) -> Result<Vec<String>, String> {
+    custom::toggle_favorite(&app, &id)
+}
+
+/// O que está tocando agora no Windows (Spotify, navegador...).
+#[tauri::command]
+async fn get_media() -> Option<media::Media> {
+    tauri::async_runtime::spawn_blocking(media::current).await.ok().flatten()
+}
+
+/// Capa do que está tocando, como `data:` URL.
+#[tauri::command]
+async fn media_art() -> Option<String> {
+    tauri::async_runtime::spawn_blocking(media::art).await.ok().flatten()
+}
+
+/// `toggle` (tocar/pausar), `next` ou `prev`.
+#[tauri::command]
+async fn media_control(action: String) -> Result<(), String> {
+    tauri::async_runtime::spawn_blocking(move || media::control(&action)).await.map_err(|e| e.to_string())?
 }
 
 /// Jogo rodando agora, para a interface saber ao (re)abrir.
@@ -332,16 +446,20 @@ pub fn run() {
         )
         .manage(console::ConsoleState::default())
         .manage(xbox::XboxState::default())
-        .invoke_handler(tauri::generate_handler![get_library, launch_game, open_external, close_game, power, add_exe_game, remove_game, rename_game, get_apps, add_app, remove_app, open_app, get_all_sessions, get_settings, set_setting, get_game_state, hide_hub, get_sessions, has_sgdb_key, set_sgdb_key, cover_options, set_cover, reset_cover])
+        .manage(ScanState::default())
+        .invoke_handler(tauri::generate_handler![get_library, launch_game, open_external, close_game, power, add_exe_game, remove_game, rename_game, get_apps, add_app, remove_app, open_app, get_all_sessions, get_settings, set_setting, get_game_state, hide_hub, get_sessions, has_sgdb_key, set_sgdb_key, cover_options, set_cover, reset_cover, get_diagnostics, open_data_dir, open_files, get_favorites, toggle_favorite, get_media, media_art, media_control])
         .setup(move |app| {
             // Em desenvolvimento, abre em janela para não prender a tela.
             #[cfg(debug_assertions)]
             if let Some(w) = app.get_webview_window("main") {
                 let _ = w.set_fullscreen(false);
             }
-            if let Err(e) = app.global_shortcut().register(toggle) {
+            log::init(app.handle());
+            log::log(format!("HubOS {} iniciou", app.package_info().version));
+            match app.global_shortcut().register(toggle) {
+                Ok(()) => SHORTCUT_OK.store(true, Ordering::Relaxed),
                 // Ex.: outro programa (o AudioHub antigo) já usa Ctrl+Alt+H.
-                eprintln!("[HubOS] não consegui registrar Ctrl+Alt+H: {e}");
+                Err(e) => log::log(format!("não consegui registrar Ctrl+Alt+H: {e}")),
             }
             enable_autostart_once(app.handle());
             console::start_watchers(app.handle());

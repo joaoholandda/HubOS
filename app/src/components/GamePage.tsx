@@ -8,13 +8,15 @@ interface Props {
   game: Game;
   onPlay: (g: Game) => void;
   onCover: (g: Game) => void;
+  fav: boolean;
+  onFav: (g: Game) => void;
 }
 
 const TABS = ["Visão geral", "Sessões"];
 const DAYS = 14;
 
 /** Página de um jogo: números, ações e as sessões que o hub gravou. */
-export function GamePage({ game, onPlay, onCover }: Props) {
+export function GamePage({ game, onPlay, onCover, fav, onFav }: Props) {
   const [tab, setTab] = useState(0);
   const [sessions, setSessions] = useState<Session[] | null>(null);
 
@@ -52,6 +54,10 @@ export function GamePage({ game, onPlay, onCover }: Props) {
           <button className="btn" data-nav onClick={() => onCover(game)}>
             <span className="g">X</span>
             Trocar capa
+          </button>
+          <button className="btn" data-nav aria-pressed={fav} onClick={() => onFav(game)}>
+            <span className="g">Y</span>
+            {fav ? "★ Favorito" : "Favoritar"}
           </button>
           {game.installDir && (
             <button className="btn" data-nav onClick={() => openFolder(game.installDir!)}>

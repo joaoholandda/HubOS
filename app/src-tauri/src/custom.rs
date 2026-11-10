@@ -46,6 +46,24 @@ pub fn games(app: &AppHandle) -> Vec<CustomGame> {
     load(app, "games.json").unwrap_or_default()
 }
 
+/// Jogos marcados como favoritos (ids), na ordem em que foram marcados.
+pub fn favorites(app: &AppHandle) -> Vec<String> {
+    load(app, "favorites.json").unwrap_or_default()
+}
+
+/// Marca ou desmarca um favorito. Devolve a lista nova.
+pub fn toggle_favorite(app: &AppHandle, id: &str) -> Result<Vec<String>, String> {
+    let mut list = favorites(app);
+    match list.iter().position(|x| x == id) {
+        Some(i) => {
+            list.remove(i);
+        }
+        None => list.push(id.to_string()),
+    }
+    save(app, "favorites.json", &list)?;
+    Ok(list)
+}
+
 pub fn all_sessions(app: &AppHandle) -> Vec<Session> {
     let text = file(app, "sessions.jsonl").and_then(|p| std::fs::read_to_string(p).ok()).unwrap_or_default();
     hubos_core::sessions::parse(&text)

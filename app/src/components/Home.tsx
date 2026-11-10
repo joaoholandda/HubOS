@@ -12,10 +12,11 @@ interface Props {
   onFocusGame: (g: Game) => void;
   /** Faixa "Em jogo agora", quando houver jogo aberto. */
   banner?: ReactNode;
+  favorites: string[];
 }
 
 /** Tela inicial no conceito "Fileira": jogo em destaque + uma linha de capas. */
-export function Home({ games, onPlay, onDetails, onCover, onFocusGame, banner }: Props) {
+export function Home({ games, onPlay, onDetails, onCover, onFocusGame, banner, favorites }: Props) {
   const [heroId, setHeroId] = useState<string | null>(games[0]?.id ?? null);
   const hero = games.find((g) => g.id === heroId) ?? games[0] ?? null;
 
@@ -51,7 +52,7 @@ export function Home({ games, onPlay, onDetails, onCover, onFocusGame, banner }:
         {banner}
         {hero && <HeroInfo game={hero} onPlay={onPlay} onDetails={onDetails} onCover={onCover} />}
       </div>
-      <Row games={games} onOpen={onPlay} />
+      <Row games={games} onOpen={onPlay} favorites={favorites} />
     </section>
   );
 }
@@ -87,11 +88,11 @@ function HeroInfo({ game, onPlay, onDetails, onCover }: { game: Game; onPlay: (g
 }
 
 /** A fileira não depende do jogo em destaque: não re-renderiza ao navegar. */
-const Row = memo(function Row({ games, onOpen }: { games: Game[]; onOpen: (g: Game) => void }) {
+const Row = memo(function Row({ games, onOpen, favorites }: { games: Game[]; onOpen: (g: Game) => void; favorites: string[] }) {
   return (
     <div className="row" data-nav-row>
       {games.map((g) => (
-        <GameCard key={g.id} game={g} onOpen={onOpen} />
+        <GameCard key={g.id} game={g} onOpen={onOpen} fav={favorites.includes(g.id)} />
       ))}
     </div>
   );

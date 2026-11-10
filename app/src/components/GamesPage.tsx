@@ -20,7 +20,7 @@ const SORTS: { label: string; cmp: (a: Game, b: Game) => number }[] = [
 const SOURCE_ORDER: Source[] = ["steam", "xbox", "ra", "exe", "epic"];
 
 /** Biblioteca completa: todas as origens juntas, com filtros, ordem e busca. */
-export function GamesPage({ games, onOpen, onAdd }: { games: Game[]; onOpen: (g: Game) => void; onAdd: () => void }) {
+export function GamesPage({ games, favorites, onOpen, onAdd }: { games: Game[]; favorites: string[]; onOpen: (g: Game) => void; onAdd: () => void }) {
   const [filter, setFilter] = useState(0);
   const [sort, setSort] = useState(0);
   const [query, setQuery] = useState("");
@@ -31,9 +31,10 @@ export function GamesPage({ games, onOpen, onAdd }: { games: Game[]; onOpen: (g:
     return [
       { id: "all", label: "Todos", test: () => true },
       { id: "installed", label: "Instalados", test: (g) => g.installed },
+      ...(favorites.length ? [{ id: "fav", label: "Favoritos", test: (g: Game) => favorites.includes(g.id) }] : []),
       ...present.map((s) => ({ id: s, label: s === "ra" ? "Emuladores" : SOURCE_LABEL[s], test: (g: Game) => g.source === s })),
     ];
-  }, [games]);
+  }, [games, favorites]);
 
   const list = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -82,7 +83,7 @@ export function GamesPage({ games, onOpen, onAdd }: { games: Game[]; onOpen: (g:
       {list.length ? (
         <div className="lib-grid">
           {list.map((g, i) => (
-            <GameCard key={g.id} game={g} onOpen={onOpen} isDefault={i === 0} />
+            <GameCard key={g.id} game={g} onOpen={onOpen} isDefault={i === 0} fav={favorites.includes(g.id)} />
           ))}
         </div>
       ) : (

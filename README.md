@@ -8,7 +8,7 @@ Cada envio para a `main` gera o instalador automaticamente:
 GitHub → aba **Actions** → último "Build" verde → em **Artifacts**, baixe **HubOS-windows**.
 Dentro tem o instalador (`HubOS_..._x64-setup.exe`) e o `hubos.exe` solto.
 
-Atalhos nesta versão: setas / controle navegam, Enter / A abre, Esc / B volta, M ou botão ☰ do controle abre o menu. Alt+F4 fecha.
+Atalhos nesta versão: setas / controle navegam, Enter / A abre, Esc / B volta, M ou botão ☰ do controle abre o menu, Q/E (LB/RB) trocam de aba, C (X) troca a capa, F (Y) favorita. Alt+F4 fecha.
 
 ## Rodar a partir do código (no Windows)
 
@@ -38,8 +38,11 @@ npm run tauri dev
 - **Apps**: programas e sites de acesso rápido.
 - **Capas** pelo SteamGridDB (chave grátis, colada uma vez).
 - **Configurações**: tema, cor de destaque, abrir com o Windows.
+- **Tocando agora**: mostra a música do Windows (Spotify, navegador) com anterior, tocar/pausar e próxima.
+- **Favoritos** (Y no controle, F no teclado) e **Perfil** (resumo, favoritos, recordes, atividade).
+- **Diagnóstico** em Configurações: o que o hub achou no PC e o diário (`hubos.log`), com botão de copiar.
 
-Ainda não: Party do Discord, Spotify, AudioHub, Loja, Downloads, Perfil, Notificações e RetroAchievements (desenhados no protótipo).
+Ainda não: Party do Discord dentro do hub, fila/playlists do Spotify, AudioHub, Loja, Notificações e RetroAchievements (desenhados no protótipo).
 
 ## Outros arquivos
 

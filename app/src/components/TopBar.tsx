@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import type { Media } from "../lib/api";
 
 interface Props {
   onMenu: () => void;
@@ -6,9 +7,13 @@ interface Props {
   onBack?: () => void;
   totalLabel: string;
   padConnected: boolean;
+  onProfile: () => void;
+  media: Media | null;
+  art: string | null;
+  onMedia: () => void;
 }
 
-export function TopBar({ onMenu, onBack, totalLabel, padConnected }: Props) {
+export function TopBar({ onMenu, onBack, totalLabel, padConnected, onProfile, media, art, onMedia }: Props) {
   return (
     <header className="top" id="top">
       <button className="chip round" data-nav onClick={onMenu} aria-label="Abrir menu">
@@ -24,14 +29,23 @@ export function TopBar({ onMenu, onBack, totalLabel, padConnected }: Props) {
           Voltar
         </button>
       )}
-      <div className="chip profile">
+      <button className="chip profile" data-nav onClick={onProfile} aria-label="Abrir perfil">
         <span className="avatar">JH</span>
         <span className="who">
           <b>João Holanda</b>
           <small>{totalLabel}</small>
         </span>
-      </div>
+      </button>
       <div className="spacer" />
+      {media && (
+        <button className="chip media" data-nav onClick={onMedia} aria-label={`Tocando agora: ${media.title}`}>
+          <span className="media-thumb">{art ? <img src={art} alt="" /> : "♪"}</span>
+          <span className="who">
+            <b>{media.title}</b>
+            <small>{media.playing ? media.artist || media.app : "Pausado"}</small>
+          </span>
+        </button>
+      )}
       {padConnected && (
         <span className="chip pad" title="Controle conectado">
           <svg className="svg" viewBox="0 0 24 24">

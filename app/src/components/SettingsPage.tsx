@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Diagnostics } from "./Diagnostics";
 import { applyAppearance, getSettings, setSetting, setSgdbKey, type Settings } from "../lib/api";
 
 const THEMES: { id: Settings["theme"]; label: string }[] = [
@@ -17,7 +18,7 @@ const ACCENTS = [
 ];
 
 /** Configurações que já funcionam de verdade nesta versão. */
-export function SettingsPage({ toast }: { toast: (m: string) => void }) {
+export function SettingsPage({ toast, onRescan }: { toast: (m: string) => void; onRescan: () => Promise<void> }) {
   const [s, setS] = useState<Settings | null>(null);
   const [key, setKey] = useState("");
   useEffect(() => {
@@ -82,7 +83,7 @@ export function SettingsPage({ toast }: { toast: (m: string) => void }) {
         <div className="srow">
           <div className="lb">
             <b>Atalhos</b>
-            <small>Ctrl + Alt + H mostra ou esconde o hub. O botão Guide do controle traz o hub de volta.</small>
+            <small>Ctrl + Alt + H mostra ou esconde o hub. O botão Guide do controle traz o hub de volta. No teclado: M abre o menu, Q e E trocam de aba, C troca a capa, F favorita.</small>
           </div>
         </div>
       </div>
@@ -122,6 +123,8 @@ export function SettingsPage({ toast }: { toast: (m: string) => void }) {
           </div>
         </div>
       </div>
+
+      <Diagnostics toast={toast} onRescan={onRescan} />
     </section>
   );
 }

@@ -52,6 +52,12 @@ export function useInput(onAction: (a: Action) => void, onPadChange?: (connected
         case "e":
         case "E":
           return onAction("nextTab");
+        case "c":
+        case "C":
+          return onAction("x");
+        case "f":
+        case "F":
+          return onAction("y");
       }
     };
 
