@@ -1,6 +1,8 @@
 //! Lado "sistema" do HubOS: acha as bibliotecas de jogos e abre os jogos.
 //! A interface (React) chama os comandos abaixo com `invoke`.
 
+mod console;
+
 use std::path::PathBuf;
 
 use hubos_core::{steam, Game};
@@ -57,6 +59,18 @@ fn launch_game(app: tauri::AppHandle, launch: String) -> Result<(), String> {
     result.map_err(|e| format!("Não consegui abrir: {e}"))
 }
 
+/// Jogo rodando agora, para a interface saber ao (re)abrir.
+#[tauri::command]
+fn get_game_state(state: tauri::State<console::ConsoleState>) -> console::GameState {
+    state.0.lock().unwrap().clone()
+}
+
+/// "Voltar ao jogo": tira o hub da frente.
+#[tauri::command]
+fn hide_hub(app: tauri::AppHandle) {
+    console::hide_hub(&app);
+}
+
 /// Onde a Steam está instalada. `HUBOS_STEAM_DIR` força uma pasta (útil para testes).
 fn find_steam_root() -> Option<PathBuf> {
     if let Ok(dir) = std::env::var("HUBOS_STEAM_DIR") {
@@ -92,17 +106,57 @@ fn candidates() -> Vec<PathBuf> {
     [".steam/steam", ".local/share/Steam"].iter().map(|p| std::path::Path::new(&home).join(p)).collect()
 }
 
+/// Decisão 42: o hub abre junto com o Windows. Liga uma vez só; depois quem
+/// manda é a opção em Configurações.
+fn enable_autostart_once(app: &tauri::AppHandle) {
+    use tauri_plugin_autostart::ManagerExt;
+    if cfg!(debug_assertions) {
+        return;
+    }
+    let Ok(dir) = app.path().app_data_dir() else { return };
+    let marker = dir.join("autostart-configurado");
+    if marker.exists() {
+        return;
+    }
+    if app.autolaunch().enable().is_ok() {
+        let _ = std::fs::create_dir_all(&dir);
+        let _ = std::fs::write(marker, "1");
+    }
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
+    use tauri_plugin_global_shortcut::{Code, GlobalShortcutExt, Modifiers, Shortcut, ShortcutState};
+
+    let toggle = Shortcut::new(Some(Modifiers::CONTROL | Modifiers::ALT), Code::KeyH);
     tauri::Builder::default()
+        // Uma instância só: abrir de novo traz a que já está rodando.
+        .plugin(tauri_plugin_single_instance::init(|app, _, _| console::show_hub(app)))
         .plugin(tauri_plugin_opener::init())
-        .invoke_handler(tauri::generate_handler![get_library, launch_game])
-        .setup(|app| {
+        .plugin(tauri_plugin_autostart::init(tauri_plugin_autostart::MacosLauncher::LaunchAgent, None))
+        .plugin(
+            tauri_plugin_global_shortcut::Builder::new()
+                .with_handler(move |app, shortcut, event| {
+                    if shortcut == &toggle && event.state() == ShortcutState::Pressed {
+                        console::toggle_hub(app);
+                    }
+                })
+                .build(),
+        )
+        .manage(console::ConsoleState::default())
+        .invoke_handler(tauri::generate_handler![get_library, launch_game, get_game_state, hide_hub])
+        .setup(move |app| {
             // Em desenvolvimento, abre em janela para não prender a tela.
             #[cfg(debug_assertions)]
             if let Some(w) = app.get_webview_window("main") {
                 let _ = w.set_fullscreen(false);
             }
+            if let Err(e) = app.global_shortcut().register(toggle) {
+                // Ex.: outro programa (o AudioHub antigo) já usa Ctrl+Alt+H.
+                eprintln!("[HubOS] não consegui registrar Ctrl+Alt+H: {e}");
+            }
+            enable_autostart_once(app.handle());
+            console::start_watchers(app.handle());
             Ok(())
         })
         .run(tauri::generate_context!())

@@ -83,7 +83,7 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 .main::-webkit-scrollbar { display: none; }
 .home { min-height: 100%; display: grid; grid-template-rows: 1fr auto; gap: 2vh; }
 .home.empty { display: grid; align-content: center; gap: 8px; }
-.hero-info { align-self: end; display: grid; gap: 14px; max-width: min(760px, 100%); padding-top: 4vh; }
+.hero-info { display: grid; gap: 14px; max-width: min(760px, 100%); padding-top: 4vh; }
 .pill { justify-self: start; font: 700 11px var(--display); letter-spacing: 0.1em; text-transform: uppercase; padding: 6px 10px; border-radius: 6px; background: var(--ink); color: var(--bg); }
 .h-title { margin: 0; font: 800 clamp(2.3rem, 5.4vw, 5rem) / 0.94 var(--display); font-stretch: 118%; letter-spacing: -0.01em; text-wrap: balance; }
 .h-meta { display: flex; flex-wrap: wrap; gap: 8px 22px; margin: 0; color: var(--ink-2); font-variant-numeric: tabular-nums; }
@@ -97,6 +97,22 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 .btn.play { background: var(--play); color: #fff; }
 .g { display: inline-grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; color: #fff; font: 700 11px var(--display); }
 .g.a { background: var(--pad-a); }
+
+.hero-col { align-self: end; display: grid; gap: 18px; }
+.hero-col .hero-info { align-self: auto; }
+
+/* ---------- em jogo ---------- */
+.nowbar {
+  display: flex; align-items: center; gap: 14px; flex-wrap: wrap; padding: 12px; border-radius: 16px; max-width: min(820px, 100%);
+  background: color-mix(in srgb, var(--surface) 88%, transparent); backdrop-filter: blur(16px);
+}
+.now-art { position: relative; width: 64px; aspect-ratio: 2 / 3; border-radius: 8px; overflow: hidden; flex: none; }
+.now-txt { display: grid; gap: 2px; min-width: 140px; flex: 1; }
+.now-txt small { font: 700 11px var(--display); letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-2); }
+.now-txt b { font: 700 18px var(--display); }
+.now-txt span { color: var(--ink-2); font-variant-numeric: tabular-nums; font-size: 13.5px; }
+.livedot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #d2453b; margin-right: 6px; animation: pulse 1.6s ease-in-out infinite; }
+@keyframes pulse { 50% { opacity: 0.35; } }
 
 /* ---------- fileira de capas ---------- */
 .row {

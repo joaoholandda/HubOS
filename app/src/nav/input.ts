@@ -96,7 +96,8 @@ export function useInput(onAction: (a: Action) => void, onPadChange?: (connected
         onPadChange?.(false);
         return;
       }
-      if (!document.hidden) {
+      // Só reage com o hub em foco: apertar A dentro de um jogo não pode mexer aqui.
+      if (!document.hidden && document.hasFocus()) {
         const b = (i: number) => !!pad.buttons[i]?.pressed;
         const ax = (i: number) => pad.axes[i] ?? 0;
         dirInput("up", b(PAD.UP) || ax(1) < -STICK, t);

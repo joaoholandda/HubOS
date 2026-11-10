@@ -1,4 +1,4 @@
-import { memo, useEffect, useState } from "react";
+import { memo, useEffect, useState, type ReactNode } from "react";
 import type { Game } from "../lib/api";
 import { hours, lastPlayed, SOURCE_LABEL } from "../lib/format";
 import { focusEngine } from "../nav/focus";
@@ -9,10 +9,12 @@ interface Props {
   onPlay: (g: Game) => void;
   onDetails: (g: Game) => void;
   onFocusGame: (g: Game) => void;
+  /** Faixa "Em jogo agora", quando houver jogo aberto. */
+  banner?: ReactNode;
 }
 
 /** Tela inicial no conceito "Fileira": jogo em destaque + uma linha de capas. */
-export function Home({ games, onPlay, onDetails, onFocusGame }: Props) {
+export function Home({ games, onPlay, onDetails, onFocusGame, banner }: Props) {
   const [hero, setHero] = useState<Game | null>(games[0] ?? null);
 
   // O destaque acompanha a capa focada na fileira.
@@ -43,7 +45,10 @@ export function Home({ games, onPlay, onDetails, onFocusGame }: Props) {
 
   return (
     <section className="home">
-      {hero && <HeroInfo game={hero} onPlay={onPlay} onDetails={onDetails} />}
+      <div className="hero-col">
+        {banner}
+        {hero && <HeroInfo game={hero} onPlay={onPlay} onDetails={onDetails} />}
+      </div>
       <Row games={games} onOpen={onPlay} />
     </section>
   );
