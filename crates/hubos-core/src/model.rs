@@ -25,6 +25,8 @@ pub struct Game {
     /// Última vez que jogou, em segundos Unix.
     pub last_played: Option<i64>,
     pub size_on_disk: Option<u64>,
+    /// Pasta do jogo no disco (quando instalado).
+    pub install_dir: Option<String>,
     /// Capa vertical (2:3) no disco, quando a loja já baixou.
     pub cover_path: Option<String>,
     /// Arte larga para o fundo, no disco.

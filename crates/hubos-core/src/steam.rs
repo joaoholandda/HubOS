@@ -73,6 +73,7 @@ pub fn scan(steam_root: &Path) -> Result<Vec<Game>, ScanError> {
                 playtime_minutes: stats.map(|s| s.minutes),
                 last_played: stats.and_then(|s| s.last_played).or(app.last_played),
                 size_on_disk: app.size_on_disk,
+                install_dir: app.install_dir.as_ref().map(|d| lib.join("steamapps").join("common").join(d).to_string_lossy().into_owned()),
                 cover_path: art.cover,
                 hero_path: art.hero,
                 logo_path: art.logo,
@@ -113,6 +114,7 @@ pub fn library_paths(steam_root: &Path) -> Vec<PathBuf> {
 struct Manifest {
     appid: u32,
     name: String,
+    install_dir: Option<String>,
     installed: bool,
     size_on_disk: Option<u64>,
     last_played: Option<i64>,
@@ -126,6 +128,7 @@ fn read_manifest(path: &Path) -> Option<Manifest> {
     Some(Manifest {
         appid,
         name: app.str("name").unwrap_or("Sem nome").to_string(),
+        install_dir: app.str("installdir").map(str::to_string),
         installed: flags & 4 != 0,
         size_on_disk: app.str("SizeOnDisk").and_then(|s| s.parse().ok()),
         last_played: app.str("LastPlayed").and_then(|s| s.parse().ok()).filter(|&t: &i64| t > 0),
@@ -269,7 +272,7 @@ mod tests {
                 lib2.display().to_string().replace('\\', "\\\\")
             ),
         );
-        w(root.join("steamapps/appmanifest_730.acf"), r#""AppState" { "appid" "730" "name" "Counter-Strike 2" "StateFlags" "4" "SizeOnDisk" "35000000000" }"#);
+        w(root.join("steamapps/appmanifest_730.acf"), r#""AppState" { "appid" "730" "name" "Counter-Strike 2" "StateFlags" "4" "SizeOnDisk" "35000000000" "installdir" "Counter-Strike Global Offensive" }"#);
         w(root.join("steamapps/appmanifest_228980.acf"), r#""AppState" { "appid" "228980" "name" "Steamworks Common Redistributables" "StateFlags" "4" }"#);
         w(lib2.join("steamapps/appmanifest_1245620.acf"), r#""AppState" { "appid" "1245620" "name" "ELDEN RING" "StateFlags" "4" "LastPlayed" "1700000000" }"#);
         w(lib2.join("steamapps/appmanifest_1091500.acf"), r#""AppState" { "appid" "1091500" "name" "Cyberpunk 2077" "StateFlags" "1026" }"#);
@@ -312,6 +315,7 @@ mod tests {
         assert_eq!(cs.last_played, Some(1_731_200_000));
         assert!(cs.cover_path.as_deref().unwrap().ends_with("730_library_600x900.jpg"));
         assert_eq!(cs.launch, "steam://rungameid/730");
+        assert!(cs.install_dir.as_deref().unwrap().replace('\\', "/").ends_with("steamapps/common/Counter-Strike Global Offensive"));
 
         let elden = games.iter().find(|g| g.id == "steam:1245620").unwrap();
         assert!(elden.cover_path.as_deref().unwrap().ends_with("library_600x900.jpg"));

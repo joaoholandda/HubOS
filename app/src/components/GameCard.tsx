@@ -6,16 +6,19 @@ import { Img } from "./Img";
 interface Props {
   game: Game;
   onOpen: (g: Game) => void;
+  /** Primeiro item da tela: recebe o foco ao entrar. */
+  isDefault?: boolean;
 }
 
 /** Capa 2:3. `memo`: navegar pela fileira não re-renderiza as capas. */
-export const GameCard = memo(function GameCard({ game, onOpen }: Props) {
+export const GameCard = memo(function GameCard({ game, onOpen, isDefault }: Props) {
   const [a, b] = tint(game.id);
   return (
     <button
       className={`card cover${game.installed ? "" : " uninstalled"}`}
       data-nav
       data-game={game.id}
+      {...(isDefault ? { "data-nav-default": "" } : {})}
       aria-label={game.title}
       onClick={() => onOpen(game)}
       style={{ background: `linear-gradient(160deg, ${a}, ${b})` }}

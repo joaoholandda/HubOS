@@ -41,3 +41,28 @@ export function tint(id: string): [string, string] {
   const light = 16 + (h % 7);
   return [`hsl(${hue} 10% ${light}%)`, `hsl(${hue + 8} 14% ${light + 16}%)`];
 }
+
+export function size(bytes: number | null): string {
+  if (!bytes) return "—";
+  const gb = bytes / 1024 ** 3;
+  return gb >= 1 ? `${gb.toLocaleString("pt-BR", { maximumFractionDigits: 1 })} GB` : `${Math.round(bytes / 1024 ** 2)} MB`;
+}
+
+/** "1 h 05 min", "42 min". */
+export function duration(secs: number): string {
+  const h = Math.floor(secs / 3600);
+  const m = Math.round((secs % 3600) / 60);
+  return h ? `${h} h ${String(m).padStart(2, "0")} min` : `${m} min`;
+}
+
+export function dayLabel(unix: number): string {
+  const d = new Date(unix * 1000);
+  const days = Math.round((new Date().setHours(0, 0, 0, 0) - new Date(d).setHours(0, 0, 0, 0)) / 86400000);
+  if (days === 0) return "Hoje";
+  if (days === 1) return "Ontem";
+  return d.toLocaleDateString("pt-BR", { weekday: "short", day: "2-digit", month: "2-digit" }).replace(".", "");
+}
+
+export function clockTime(unix: number): string {
+  return new Date(unix * 1000).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
+}

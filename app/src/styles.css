@@ -172,6 +172,44 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 .ri.here { color: var(--ink); background: var(--line); }
 .ri.is-focus { background: var(--ink); color: var(--bg); box-shadow: none; transform: none; }
 
+/* ---------- páginas ---------- */
+.tnum { font-variant-numeric: tabular-nums; }
+.page { padding-block: 8px 32px; }
+.page-head { display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; }
+.page-title { margin: 4px 0 6px; font: 700 clamp(30px, 3.2vw, 46px) / 1 var(--display); letter-spacing: -0.03em; }
+.toolbar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin: 14px 0 6px; }
+.tabs { display: flex; gap: 6px; flex-wrap: wrap; }
+.tab {
+  height: 40px; padding: 0 16px; border-radius: var(--r-md); font-weight: 600; font-size: 14px; color: var(--ink-2); background: var(--surface);
+  transition: transform 0.18s var(--ease), box-shadow 0.18s var(--ease), background 0.15s, color 0.15s; white-space: nowrap;
+}
+.tab small { margin-left: 6px; opacity: 0.65; font-variant-numeric: tabular-nums; font-weight: 500; }
+.tab[aria-selected="true"] { background: var(--ink); color: var(--bg); }
+.tab.is-focus { box-shadow: var(--focus); transform: scale(1.04); }
+.bumper { font: 700 10.5px var(--body); letter-spacing: 0.08em; padding: 4px 8px; border-radius: var(--r-sm); background: var(--line); color: var(--ink-2); }
+.field.search { height: 44px; width: min(260px, 100%); border-radius: var(--r-pill); padding: 0 18px; }
+.lib-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 150px), 1fr)); gap: 24px 18px; padding: 16px 6px 30px; }
+.lib-grid .cover { height: auto; width: 100%; content-visibility: auto; contain-intrinsic-size: 150px 225px; }
+.empty-note { padding: 40px 0; }
+
+/* detalhes do jogo */
+.game-head { min-height: min(52vh, 500px); display: grid; align-content: end; gap: 16px; padding-bottom: 18px; }
+.stats { display: flex; flex-wrap: wrap; gap: 12px 40px; }
+.stat { display: grid; gap: 2px; }
+.stat small { color: var(--ink-2); font-size: 12.5px; }
+.stat b { font: 600 22px var(--display); letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+.panel { background: color-mix(in srgb, var(--surface) 92%, transparent); backdrop-filter: blur(16px); border-radius: var(--r-lg); padding: clamp(18px, 2vw, 28px); }
+.info { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 12px 28px; margin: 0; font-size: 14.5px; }
+.info dt { color: var(--ink-2); }
+.info dd { margin: 0; overflow-wrap: anywhere; user-select: text; }
+.eyebrow { margin: 0 0 12px; font: 700 11px var(--body); letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-2); }
+.bars { display: flex; align-items: flex-end; gap: 6px; height: 120px; margin-bottom: 26px; }
+.bar { flex: 1; height: 100%; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; gap: 6px; font-size: 10.5px; color: var(--ink-2); font-variant-numeric: tabular-nums; }
+.bar i { display: block; width: min(24px, 70%); min-height: 2px; background: var(--accent); border-radius: 4px 4px 0 0; }
+.rows { display: grid; gap: 8px; }
+.rowline { display: flex; justify-content: space-between; gap: 16px; padding: 13px 16px; border-radius: var(--r-md); background: var(--surface-2); transition: box-shadow 0.18s var(--ease); }
+.rowline.is-focus { box-shadow: var(--focus); }
+
 /* ---------- painel lateral (capa e futuros) ---------- */
 .sheet {
   position: fixed; z-index: 8; top: 0; right: 0; bottom: 0; width: min(440px, 100%); padding: 24px;

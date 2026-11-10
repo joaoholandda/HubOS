@@ -14,6 +14,7 @@ export interface Game {
   playtimeMinutes: number | null;
   lastPlayed: number | null;
   sizeOnDisk: number | null;
+  installDir: string | null;
   coverPath: string | null;
   heroPath: string | null;
   logoPath: string | null;
@@ -65,6 +66,33 @@ export function onGameState(cb: (s: GameState) => void): () => void {
 /** "Voltar ao jogo": tira o hub da frente. */
 export async function hideHub(): Promise<void> {
   if (inTauri) await invoke("hide_hub");
+}
+
+export interface Session {
+  game: string;
+  start: number;
+  end: number;
+}
+
+/** Sessões gravadas pelo hub para um jogo (mais recente primeiro). */
+export async function getSessions(gameId: string): Promise<Session[]> {
+  if (!inTauri) return mockSessions(gameId);
+  return invoke<Session[]>("get_sessions", { gameId });
+}
+
+function mockSessions(gameId: string): Session[] {
+  let h = 0;
+  for (const c of gameId) h = (h * 31 + c.charCodeAt(0)) >>> 0;
+  const now = Math.floor(Date.now() / 1000);
+  return Array.from({ length: 9 }, (_, i) => {
+    const start = now - i * 86400 * (1 + ((h >> i) & 1)) - 3600 * 3;
+    return { game: gameId, start, end: start + 1800 + ((h >> (i + 2)) % 8) * 1200 };
+  });
+}
+
+/** Abre uma pasta no Explorador. */
+export async function openFolder(path: string): Promise<void> {
+  if (inTauri) await invoke("launch_game", { launch: path });
 }
 
 export interface CoverOption {

@@ -4,6 +4,7 @@
 //! (inclusive no CI em Linux) com arquivos de exemplo.
 
 pub mod model;
+pub mod sessions;
 pub mod sgdb;
 pub mod steam;
 pub mod vdf;

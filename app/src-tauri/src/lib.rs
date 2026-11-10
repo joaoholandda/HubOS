@@ -77,6 +77,14 @@ fn hide_hub(app: tauri::AppHandle) {
     console::hide_hub(&app);
 }
 
+/// Sessões que o hub gravou para um jogo, da mais recente para a mais antiga.
+#[tauri::command]
+fn get_sessions(app: tauri::AppHandle, game_id: String) -> Vec<hubos_core::sessions::Session> {
+    let Ok(dir) = app.path().app_data_dir() else { return vec![] };
+    let text = std::fs::read_to_string(dir.join("sessions.jsonl")).unwrap_or_default();
+    hubos_core::sessions::for_game(&hubos_core::sessions::parse(&text), &game_id)
+}
+
 /// Se já existe chave do SteamGridDB salva.
 #[tauri::command]
 fn has_sgdb_key(app: tauri::AppHandle) -> bool {
@@ -178,7 +186,7 @@ pub fn run() {
                 .build(),
         )
         .manage(console::ConsoleState::default())
-        .invoke_handler(tauri::generate_handler![get_library, launch_game, get_game_state, hide_hub, has_sgdb_key, set_sgdb_key, cover_options, set_cover, reset_cover])
+        .invoke_handler(tauri::generate_handler![get_library, launch_game, get_game_state, hide_hub, get_sessions, has_sgdb_key, set_sgdb_key, cover_options, set_cover, reset_cover])
         .setup(move |app| {
             // Em desenvolvimento, abre em janela para não prender a tela.
             #[cfg(debug_assertions)]

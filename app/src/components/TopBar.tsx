@@ -2,11 +2,13 @@ import { useEffect, useState } from "react";
 
 interface Props {
   onMenu: () => void;
+  /** Quando existe, mostra o botão Voltar (telas que não são a inicial). */
+  onBack?: () => void;
   totalLabel: string;
   padConnected: boolean;
 }
 
-export function TopBar({ onMenu, totalLabel, padConnected }: Props) {
+export function TopBar({ onMenu, onBack, totalLabel, padConnected }: Props) {
   return (
     <header className="top" id="top">
       <button className="chip round" data-nav onClick={onMenu} aria-label="Abrir menu">
@@ -14,6 +16,14 @@ export function TopBar({ onMenu, totalLabel, padConnected }: Props) {
           <path d="M4 7h16M4 12h16M4 17h16" />
         </svg>
       </button>
+      {onBack && (
+        <button className="chip" data-nav onClick={onBack}>
+          <svg className="svg" viewBox="0 0 24 24">
+            <path d="M15 5l-7 7 7 7" />
+          </svg>
+          Voltar
+        </button>
+      )}
       <div className="chip profile">
         <span className="avatar">JH</span>
         <span className="who">

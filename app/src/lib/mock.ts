@@ -13,6 +13,7 @@ function g(id: string, title: string, source: Game["source"], hours: number, day
     playtimeMinutes: hours * 60,
     lastPlayed: now - daysAgo * day,
     sizeOnDisk: null,
+    installDir: null,
     coverPath: null,
     heroPath: null,
     logoPath: null,
