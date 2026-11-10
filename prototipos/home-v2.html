@@ -460,6 +460,84 @@ body.m-drawer .rail.exp .rail-bg{transform:none}
 .alertrow input.f,.alertrow input:focus{outline:none;box-shadow:0 0 0 3px var(--ring)}
 .sgov{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:14px;align-items:start}
 @media (max-width:900px){ .sgov{grid-template-columns:1fr} }
+/* ---------- em jogo ---------- */
+.livedot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--pad-b);margin-right:6px;animation:pulse 1.6s ease-in-out infinite;vertical-align:1px}
+@keyframes pulse{50%{opacity:.35}}
+.nowbar{display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding:12px;border-radius:16px;background:color-mix(in srgb,var(--surface) 88%,transparent);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);margin-bottom:8px;max-width:100%}
+.nowbar i{width:96px;aspect-ratio:16/9;border-radius:10px;background-size:cover;background-position:center;flex:none}
+.nowbar > div{display:grid;gap:2px;min-width:140px;flex:1}
+.nowbar small{font:700 11px var(--display);letter-spacing:.1em;text-transform:uppercase;color:var(--ink-2)}
+.nowbar b{font:700 18px var(--display)}
+.nowbar span#nowTime{color:var(--ink-2);font-variant-numeric:tabular-nums;font-size:13.5px}
+.nowbar .btn{height:44px}
+.btn.confirm{background:var(--pad-b);color:#fff}
+/* ---------- downloads ---------- */
+#vdl{padding-block:8px 30px}
+.dl{display:grid;grid-template-columns:72px minmax(0,1fr) auto;gap:6px 16px;align-items:center;padding:14px;border-radius:16px;background:var(--surface);margin-bottom:10px}
+.dl > i{width:72px;aspect-ratio:2/3;max-width:100%;border-radius:8px;background-size:cover;background-position:center;grid-row:span 2}
+.dl b{font:700 17px var(--display)}
+.dl small{color:var(--ink-2);font-size:13px;font-variant-numeric:tabular-nums}
+.dl .ctl{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+.dl .opt{min-height:38px;font-size:13px}
+.dlbar{grid-column:2 / -1;height:8px;border-radius:4px;background:var(--line);overflow:hidden}
+.dlbar i{display:block;height:100%;width:100%;background:var(--play);transform-origin:left;transition:transform .9s linear}
+.dl.paused .dlbar i{background:var(--ink-2)}
+.dlsec{font:700 11px var(--display);letter-spacing:.1em;text-transform:uppercase;color:var(--ink-2);margin:20px 0 10px}
+/* ---------- notificações ---------- */
+.badge{position:absolute;top:-2px;right:-2px;min-width:18px;height:18px;border-radius:9px;background:var(--pad-b);color:#fff;font:700 11px var(--body);display:grid;place-items:center;padding:0 5px}
+.ncards{position:fixed;z-index:12;top:calc(76px + env(safe-area-inset-top,0px));right:calc(20px + env(safe-area-inset-right,0px));display:grid;gap:10px;width:min(360px,calc(100% - 32px));pointer-events:none}
+.ncard{display:flex;gap:12px;align-items:center;padding:12px;border-radius:14px;background:var(--surface);box-shadow:0 20px 40px -18px var(--shadow);animation:nin .35s var(--ease)}
+.ncard.out{animation:nout .3s ease forwards}
+@keyframes nin{from{transform:translateX(30px);opacity:0}}
+@keyframes nout{to{transform:translateX(30px);opacity:0}}
+.ncard i,.nitem i{width:44px;height:44px;border-radius:10px;flex:none;background-size:cover;background-position:center;display:grid;place-items:center;color:#fff}
+.ncard div,.nitem div{display:grid;gap:2px;min-width:0}
+.ncard small,.nitem small{font:700 10.5px var(--display);letter-spacing:.08em;text-transform:uppercase;color:var(--ink-2)}
+.ncard b,.nitem b{font-weight:600;font-size:14px}
+.ncard span,.nitem span{color:var(--ink-2);font-size:13px}
+.nitem{display:flex;gap:12px;align-items:center;padding:10px;border-radius:12px;background:var(--surface-2);transition:box-shadow .18s,transform .18s var(--ease)}
+.nitem.unread{box-shadow:inset 3px 0 0 var(--accent)}
+.nitem.f{box-shadow:0 0 0 3px var(--ring);transform:scale(1.02)}
+.nitem em{margin-left:auto;font-style:normal;font-size:12px;color:var(--ink-2);flex:none}
+/* ---------- energia / confirmação ---------- */
+.confirm-box{display:grid;gap:10px;padding:14px;border-radius:12px;background:var(--surface-2)}
+.confirm-box p{margin:0}
+/* ---------- adicionar jogo ---------- */
+.fld{display:grid;gap:6px}
+.fld label{font-size:13px;color:var(--ink-2)}
+.fld input{height:44px;border-radius:12px;border:1px solid var(--line);background:var(--surface-2);color:var(--ink);padding:0 12px;font:inherit;min-width:0}
+.fld input.f,.fld input:focus{outline:none;box-shadow:0 0 0 3px var(--ring)}
+.cvpick{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.cvpick .cover{height:auto;width:100%}
+.cvpick .cover[aria-pressed="true"]{box-shadow:0 0 0 3px var(--play)}
+/* ---------- erros ---------- */
+.errbar{display:flex;gap:12px;align-items:center;padding:12px 16px;border-radius:12px;background:color-mix(in srgb,var(--pad-y) 18%,var(--surface));margin:10px 0;font-size:14px}
+.errbar b{font-weight:600}
+/* ---------- primeira configuração ---------- */
+.onb{position:fixed;inset:0;z-index:20;background:var(--bg);display:grid;place-items:center;padding:24px max(16px, env(safe-area-inset-right, 0px)) 24px max(16px, env(safe-area-inset-left, 0px));overflow-y:auto}
+.onb-card{width:min(720px,100%);display:grid;gap:18px}
+.onb-steps{display:flex;gap:6px}
+.onb-steps i{flex:1;height:4px;border-radius:2px;background:var(--line)}
+.onb-steps i.on{background:var(--accent)}
+.onb h2{margin:0;font:800 clamp(28px,3.4vw,44px)/1.05 var(--display);font-stretch:115%;text-wrap:balance}
+.onb p{margin:0;color:var(--ink-2);line-height:1.55;max-width:60ch}
+.onb .grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr));gap:10px}
+.onb .choice{display:grid;gap:4px;padding:16px;border-radius:14px;background:var(--surface);text-align:left;transition:box-shadow .18s,transform .18s var(--ease)}
+.onb .choice b{font-weight:600}
+.onb .choice small{color:var(--ink-2)}
+.onb .choice[aria-pressed="true"]{box-shadow:inset 0 0 0 2px var(--accent)}
+.onb .choice.f{box-shadow:0 0 0 3px var(--ring);transform:scale(1.02)}
+.onb .nav2{display:flex;gap:10px;justify-content:space-between;flex-wrap:wrap}
+/* ---------- abertura ---------- */
+.splash{position:fixed;inset:0;z-index:30;background:var(--bg);display:grid;place-items:center;transition:opacity .45s ease}
+.splash.gone{opacity:0;pointer-events:none}
+.sp-in{display:grid;gap:22px;justify-items:center}
+.sp-logo{font:800 clamp(44px,7vw,84px)/1 var(--display);font-stretch:125%;letter-spacing:-.02em;animation:spin .7s var(--ease) both}
+.sp-logo span{color:var(--accent)}
+@keyframes spin{from{opacity:0;transform:translateY(12px) scale(.96)}}
+.sp-bar{width:160px;height:4px;border-radius:2px;background:var(--line);overflow:hidden}
+.sp-bar i{display:block;height:100%;width:100%;background:var(--accent);transform-origin:left;animation:spbar 1.1s var(--ease) both}
+@keyframes spbar{from{transform:scaleX(0)}}
 /* ---------- spotify ---------- */
 .eqmini{display:flex;align-items:flex-end;gap:2px;height:16px;width:16px}
 .eqmini i{flex:1;background:var(--accent);border-radius:1px;height:30%;animation:eqb 1s ease-in-out infinite}
@@ -478,7 +556,7 @@ body.m-drawer .rail.exp .rail-bg{transform:none}
 .q{display:flex;gap:10px;align-items:center;font-size:13.5px;color:var(--ink-2)}
 .q i{width:34px;height:34px;border-radius:6px;flex:none}
 .q b{color:var(--ink);font-weight:500}
-@media (max-width:760px){ .np{display:none} }
+@media (max-width:1400px){ .np{display:none} }
 /* ---------- dicas do controle ---------- */
 .hints{position:relative;z-index:3;display:flex;align-items:center;gap:10px 22px;flex-wrap:wrap;padding-block:12px;font-size:13.5px;color:var(--ink-2)}
 .hint{display:inline-flex;align-items:center;gap:8px}
@@ -552,7 +630,7 @@ body.m-drawer .rail.exp .rail-bg{transform:none}
   <button class="ri" data-nav data-act="go:games"><svg class="svg" viewBox="0 0 24 24"><rect x="2.5" y="7" width="19" height="11" rx="5.5"/><path d="M7 10.5v4M5 12.5h4M15.5 11.5h.01M17.5 13.5h.01"/></svg><span>Jogos</span></button>
   <button class="ri" data-nav data-act="go:apps"><svg class="svg" viewBox="0 0 24 24"><rect x="4" y="4" width="7" height="7" rx="1"/><rect x="13" y="4" width="7" height="7" rx="1"/><rect x="4" y="13" width="7" height="7" rx="1"/><rect x="13" y="13" width="7" height="7" rx="1"/></svg><span>Apps</span></button>
   <button class="ri" data-nav data-act="go:store"><svg class="svg" viewBox="0 0 24 24"><path d="M5 8h14l-1 12H6zM9 8a3 3 0 0 1 6 0"/></svg><span>Loja</span></button>
-  <button class="ri" data-nav data-act="toast:Downloads: próxima etapa do desenho"><svg class="svg" viewBox="0 0 24 24"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg><span>Downloads</span></button>
+  <button class="ri" data-nav data-act="go:dl"><svg class="svg" viewBox="0 0 24 24"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg><span>Downloads</span></button>
   <button class="ri" data-nav data-act="party"><svg class="svg" viewBox="0 0 24 24"><path d="M4 5h16v11H9l-5 4z"/></svg><span>Party</span></button>
   <button class="ri" data-nav data-act="audio"><svg class="svg" viewBox="0 0 24 24"><path d="M4 15v-3a8 8 0 0 1 16 0v3"/><rect x="3" y="14" width="4" height="6" rx="1.5"/><rect x="17" y="14" width="4" height="6" rx="1.5"/></svg><span>Áudio</span></button>
   <button class="ri" data-nav data-act="music"><svg class="svg" viewBox="0 0 24 24"><path d="M9 18V5l11-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="17" cy="16" r="3"/></svg><span>Spotify</span></button>
@@ -562,7 +640,7 @@ body.m-drawer .rail.exp .rail-bg{transform:none}
   <button class="ri" data-nav data-act="go:settings"><svg class="svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"/></svg><span>Configurações</span></button>
   <div class="rail-gap"></div>
   <button class="ri" data-nav data-act="toast:No PC real, o hub minimizaria e mostraria a área de trabalho"><svg class="svg" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="12" rx="1.5"/><path d="M9 20h6M12 16v4"/></svg><span>Área de trabalho</span></button>
-  <button class="ri" data-nav data-act="toast:Energia: suspender, reiniciar ou desligar"><svg class="svg" viewBox="0 0 24 24"><path d="M12 3v9M6.3 6.3a8 8 0 1 0 11.4 0"/></svg><span>Energia</span></button>
+  <button class="ri" data-nav data-act="power"><svg class="svg" viewBox="0 0 24 24"><path d="M12 3v9M6.3 6.3a8 8 0 1 0 11.4 0"/></svg><span>Energia</span></button>
 </nav>
 
   <header class="top inner" id="top">
@@ -593,6 +671,9 @@ body.m-drawer .rail.exp .rail-bg{transform:none}
       <svg class="svg" viewBox="0 0 24 24"><path d="M4 15v-3a8 8 0 0 1 16 0v3"/><rect x="3" y="14" width="4" height="6" rx="1.5"/><rect x="17" y="14" width="4" height="6" rx="1.5"/></svg>
       <span id="audioChipTxt">FOSI K5</span>
     </button>
+    <button class="chip" data-nav data-act="nowchip" id="nowChip" hidden><span class="livedot"></span><span id="nowChipTxt"></span></button>
+    <button class="chip" data-nav data-act="go:dl" id="dlChip" hidden><svg class="svg" viewBox="0 0 24 24"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg><span id="dlChipTxt"></span></button>
+    <button class="chip round" data-nav data-act="notifs" aria-label="Notificações" style="position:relative"><svg class="svg" viewBox="0 0 24 24"><path d="M6 16V11a6 6 0 0 1 12 0v5l2 2H4zM10 20a2 2 0 0 0 4 0"/></svg><span class="badge" id="nBadge" hidden></span></button>
     <span class="clock" id="clock"></span>
   </header>
 
@@ -600,6 +681,12 @@ body.m-drawer .rail.exp .rail-bg{transform:none}
     <!-- Início: fileira -->
     <section class="view inner" id="v1" data-view="1">
       <div class="hero-info">
+        <div class="nowbar" id="nowBar" hidden>
+          <i id="nowArt"></i>
+          <div><small><span class="livedot"></span>Em jogo agora</small><b id="nowTitle"></b><span id="nowTime"></span></div>
+          <button class="btn play" data-nav data-act="resume"><span class="g a">A</span>Voltar ao jogo</button>
+          <button class="btn" data-nav data-act="quitgame" id="quitBtn">Fechar jogo</button>
+        </div>
         <span class="pill" id="h-src">Steam</span>
         <h1 class="h-title" id="h-title"></h1>
         <p class="h-meta" id="h-meta"></p>
@@ -612,7 +699,8 @@ body.m-drawer .rail.exp .rail-bg{transform:none}
     </section>
 
     <section class="view inner" id="vgames" hidden>
-      <div class="lib-head"><h1 class="page-h">Jogos</h1><span id="libCount"></span></div>
+      <div class="lib-head"><h1 class="page-h">Jogos</h1><span id="libCount"></span><div class="spacer"></div><button class="chip" data-nav data-act="addgame"><svg class="svg" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>Adicionar jogo</button></div>
+      <div class="errbar" id="libErr" hidden></div>
       <div class="lib-bar">
         <span class="bumper">LB</span><div class="ftabs" id="ftabs"></div><span class="bumper">RB</span>
         <div class="spacer"></div>
@@ -666,6 +754,10 @@ body.m-drawer .rail.exp .rail-bg{transform:none}
       <div id="storeBody"></div>
     </section>
     <section class="view inner" id="vsgame" hidden></section>
+    <section class="view inner" id="vdl" hidden>
+      <div class="lib-head"><h1 class="page-h">Downloads</h1><span id="dlSub"></span></div>
+      <div id="dlBody"></div>
+    </section>
     <section class="view inner" id="vapps" hidden>
       <h1 class="page-h">Apps</h1>
       <h2 class="sec-h">Sites <small>abrem numa aba nova do Firefox, que já está aberto em segundo plano</small></h2>
@@ -723,6 +815,14 @@ body.m-drawer .rail.exp .rail-bg{transform:none}
 <aside class="sheet" id="cvsheet" hidden aria-label="Trocar capa"></aside>
 <input type="file" id="fileIn" accept="image/*" hidden>
 <aside class="sheet" id="gopts" hidden aria-label="Opções do jogo"></aside>
+
+<aside class="sheet" id="notifs" hidden aria-label="Notificações"></aside>
+<aside class="sheet" id="power" hidden aria-label="Energia"></aside>
+<aside class="sheet" id="addg" hidden aria-label="Adicionar jogo"></aside>
+<input type="file" id="exeIn" accept=".exe,.lnk,.bat" hidden>
+<div class="ncards" id="ncards" aria-live="polite"></div>
+<div class="onb" id="onb" hidden role="dialog" aria-label="Primeira configuração"></div>
+<div class="splash" id="splash"><div class="sp-in"><div class="sp-logo">Hub<span>OS</span></div><div class="sp-bar"><i></i></div></div></div>
 
 <div class="modal" id="launch" hidden role="dialog" aria-label="Iniciando jogo">
   <div class="m-art" id="m-art"></div>
@@ -1050,7 +1150,7 @@ function openOpts(){
   const o = (act, txt, extra = "") => `<button class="opt${extra}" data-nav data-act="toast:${act}">${txt}</button>`;
   $("#gopts").innerHTML = `<h3>Opções</h3><p class="sub">${g.t}</p>` + (un
     ? o("Abrindo a loja na página de instalação", "Instalar em outra pasta") + o("Página na loja aberta", "Ver na loja")
-    : o("Pasta aberta no Explorador", "Abrir pasta do jogo") + o("Aqui você escolhe outro .exe e argumentos (ex: -dx12)", "Executável e argumentos") + o("Escolha uma capa do SteamGridDB", "Trocar capa") + (g.src === "steam" || g.src === "epic" ? o(`${SRC[g.src]} verificando os arquivos`, "Verificar arquivos") : "") + o("Pediria confirmação antes de desinstalar", "Desinstalar", " danger"));
+    : (g.src === "ra" ? o(`Emulador deste jogo: ${EMUSEL[g.plat] || "RetroArch"}. Troca em Configurações › Biblioteca`, "Emulador: " + (EMUSEL[g.plat] || "RetroArch")) : "") + o("Pasta aberta no Explorador", "Abrir pasta do jogo") + o("Aqui você escolhe outro .exe e argumentos (ex: -dx12)", "Executável e argumentos") + o("Escolha uma capa do SteamGridDB", "Trocar capa") + (g.src === "steam" || g.src === "epic" ? o(`${SRC[g.src]} verificando os arquivos`, "Verificar arquivos") : "") + o("Pediria confirmação antes de desinstalar", "Desinstalar", " danger"));
   openOverlay($("#gopts"));
 }
 function bumper(d){
@@ -1269,6 +1369,7 @@ function secHTML(k){
   if (k === "covers") return grp("Revisar capas", `<p class="note">Passa por todos os jogos, um de cada vez, para você trocar as capas feias de uma vez. Em cada um: escolher uma opção do SteamGridDB, subir a sua ou pular.</p>` + row("Modo revisão", `${GAMES.length} jogos`, btn("review", "Começar revisão"))) +
     grp("Todos os jogos", `<div class="cvgrid">${GAMES.map(g => `<button class="card cover g-${g.id}" data-nav data-act="cv:${g.id}" aria-label="Trocar capa de ${g.t}"><span class="art"></span><span class="cv-title">${g.t}</span></button>`).join("")}</div>`);
   if (k === "lib") return grp("Origens", [["steam","Steam"],["xbox","Xbox (app no PC)"],["ra","Emuladores · RetroAchievements"],["exe","Jogos .exe"],["epic","Epic"]].map(([id, n]) => row(n, id === "xbox" ? "Encontra os jogos instalados pelo app Xbox. O tempo é medido pelo hub." : id === "exe" ? "Procura jogos nas pastas abaixo." : "", tg("src_" + id))).join("")) +
+    grp("Emuladores", `<p class="note">Qual emulador abre cada console. As conquistas vêm do RetroAchievements (conta conectada).</p>` + EMU.map(([k, d, opts]) => row(k, "", opts.map(o => `<button class="opt" data-nav data-act="emu:${k}:${o}" aria-pressed="${EMUSEL[k] === o}">${o}</button>`).join(""))).join("")) +
     grp("Pastas de jogos e ROMs", SET.folders.map((f, i) => row(f, i ? "ROMs para o RetroArch" : "Jogos .exe avulsos", btn(`rmfolder:${i}`, "Remover"))).join("") + row("Adicionar pasta", "O hub vasculha a pasta e acha os executáveis de jogo.", btn("addfolder", "Adicionar…")));
   if (k === "acc"){
     const A = [["Steam","Conectado · horas, conquistas e biblioteca",true],["Xbox","Detectando jogos instalados no PC",true],["RetroAchievements","Conectado · 1.245 pontos",true],["Spotify","Premium · música e controles",true],["Discord","Conectado · party e call",true],["Epic","Não conectado · pouco usado",false]];
@@ -1300,9 +1401,12 @@ function secHTML(k){
   if (k === "data") return grp("Backup automático", row("Backup automático", "Horas, sessões, conquistas, capas, favoritos e configurações.", tg("backup")) + row("Frequência", "", chips("bfreq", ["Diário","Semanal"])) +
       row("Destino", "Na nuvem, o backup sobrevive à formatação.", chips("bdest", ["Pasta local","OneDrive","Google Drive"])) + row("Último backup", "Hoje, 04:00 · 2,3 MB", btn("toast:Backup feito agora", "Fazer backup agora"))) +
     grp("Formatou o PC?", `<p class="note">Instale o hub de novo, conecte a nuvem e escolha <b>Restaurar</b>. Cada jogo é reconhecido por uma "impressão digital" (nome, tamanho e hash do executável, ou o ID na Steam/Xbox), não pela pasta. Mesmo um .exe instalado em outro lugar volta com todas as horas.</p>` +
-      row("Restaurar de um backup", "", btn("toast:Escolheria o arquivo de backup", "Restaurar…")) + row("Exportar arquivo", "Um arquivo único para guardar onde quiser.", btn("toast:Arquivo hubos-backup.zip exportado", "Exportar…"))) +
+      row("Restaurar de um backup", "", btn("toast:Escolheria o arquivo de backup", "Restaurar…")) + row("Refazer a primeira configuração", "O assistente que aparece ao instalar ou depois de formatar.", btn("onb", "Abrir assistente")) + row("Exportar arquivo", "Um arquivo único para guardar onde quiser.", btn("toast:Arquivo hubos-backup.zip exportado", "Exportar…"))) +
     grp("Zona de perigo", row("Apagar estatísticas", "Apaga horas e sessões medidas pelo hub. Não mexe na Steam nem no Xbox.", btn("toast:Pediria confirmação duas vezes", "Apagar…", " danger")));
-  return grp("HubOS", row("Versão", "0.1 · protótipo de interface", "") + row("Feito por", "Você e o Claude, desde 10/11/2026", ""));
+  return grp("HubOS", row("Versão", "0.1 · protótipo de interface", "") + row("Feito por", "Você e o Claude, desde 10/11/2026", "") + row("Tela de abertura", "A animação ao ligar o PC.", btn("splash", "Ver de novo"))) +
+    grp("Simular erros (só no protótipo)", row("Sem internet", "A Loja mostra preços guardados.", `<button class="tg" role="switch" data-nav data-act="sim:offline" aria-checked="${SIM.offline}"></button>`) +
+      row("Steam offline", "Aviso na biblioteca.", `<button class="tg" role="switch" data-nav data-act="sim:steam" aria-checked="${SIM.steam}"></button>`) +
+      row("Jogo não abre", "Tente abrir Halo Infinite.", `<button class="tg" role="switch" data-nav data-act="sim:fail" aria-checked="${SIM.fail}"></button>`));
 }
 function renderSetNav(){
   $("#setnav").innerHTML = SECS.map(([k, n, ic]) => `<button class="sn" data-nav data-act="sec:${k}" data-sec="${k}" aria-current="${k === secCur}"><svg class="svg" viewBox="0 0 24 24">${ic}</svg>${n}</button>`).join("");
@@ -1445,7 +1549,7 @@ function renderStore(){
     return;
   }
   const wish = STORE.filter(x => x.wish);
-  $("#storeBody").innerHTML = `
+  $("#storeBody").innerHTML = (SIM.offline ? `<div class="errbar"><b>Sem internet.</b> Mostrando os preços guardados de 2 h atrás. Comprar e alertas voltam quando a conexão voltar.</div>` : "") + `
     <div class="shelf"><h2>Recomendados para você <small>com base no que você joga</small></h2><div class="row">${STORE.filter(x => x.why).map(x => scard(x, true)).join("")}</div></div>
     <div class="shelf"><h2>Promoções <small>menor preço entre todas as lojas</small></h2><div class="row">${STORE.filter(x => off(x) >= 30).sort((a, b) => off(b) - off(a)).map(x => scard(x)).join("")}</div></div>
     <div class="shelf"><h2>Lista de desejos <small>Steam + lista do hub · ${wish.length} jogos</small></h2>
@@ -1512,6 +1616,163 @@ $("#storeSearch").addEventListener("input", renderStore);
 let sCur = null;
 document.addEventListener("change", e => { if (e.target.id === "alertVal" && sCur && ALERT[sCur]){ ALERT[sCur] = +e.target.value; renderStore(); } });
 
+/* ---------- em jogo ---------- */
+let playing = null, quitArm = false;
+const mmss2 = sec => `${Math.floor(sec / 3600)}:${String(Math.floor(sec / 60) % 60).padStart(2, "0")}:${String(sec % 60).padStart(2, "0")}`;
+function renderNow(){
+  const on = !!playing;
+  $("#nowBar").hidden = !on; $("#nowChip").hidden = !on;
+  if (!on) return;
+  const sec = Math.floor((Date.now() - playing.start) / 1000) + playing.offset;
+  $("#nowArt").style.backgroundImage = `url(${ART[playing.g.id].l})`;
+  $("#nowTitle").textContent = playing.g.t;
+  $("#nowTime").textContent = `Sessão de ${mmss2(sec)} · ${SRC[playing.g.src]}`;
+  $("#nowChipTxt").textContent = `${playing.g.t.length > 16 ? playing.g.t.slice(0, 15) + "…" : playing.g.t} · ${mmss2(sec)}`;
+}
+setInterval(() => { if (playing) renderNow(); }, 1000);
+function quitGame(){
+  if (!quitArm){ quitArm = true; const b = $("#quitBtn"); b.classList.add("confirm"); b.textContent = "Confirmar: fechar?"; setTimeout(() => { quitArm = false; b.classList.remove("confirm"); b.textContent = "Fechar jogo"; }, 3000); return; }
+  const sec = Math.floor((Date.now() - playing.start) / 1000) + playing.offset, g = playing.g;
+  playing = null; quitArm = false; $("#quitBtn").classList.remove("confirm"); $("#quitBtn").textContent = "Fechar jogo"; renderNow();
+  focusEl($("#h-play"));
+  notify({ kind:"session", title:`Sessão de ${g.t} registrada`, text:`${hm(sec / 3600)} · somada às suas estatísticas`, g:g.id });
+}
+
+/* ---------- downloads ---------- */
+const DL = [
+  { id:"cyber", size:70, done:23.8, speed:42, src:"Steam", paused:false },
+  { id:"bg3", size:150, done:0, speed:0, src:"Steam", paused:false, queued:true },
+  { id:"fh5", size:3.2, done:0, speed:0, src:"Xbox", paused:false, queued:true, update:true },
+];
+const DLDONE = [{ id:"hades2", txt:"Atualização 1.2 · 1,4 GB · ontem" },{ id:"smw", txt:"ROM verificada · RetroArch · sábado" }];
+const gb = v => v.toLocaleString("pt-BR", { maximumFractionDigits:1 }) + " GB";
+function dlName(d){ return (BY[d.id] || {}).t; }
+function renderDL(){
+  const act = DL.find(d => !d.queued);
+  $("#dlSub").textContent = act ? `${dlName(act)} baixando · ${act.speed} MB/s` : DL.length ? "fila pausada" : "nada baixando";
+  $("#dlChip").hidden = !act || act.paused;
+  if (act) $("#dlChipTxt").textContent = Math.floor(act.done / act.size * 100) + "%";
+  if (page !== "vdl") return;
+  const item = (d, i) => { const p = d.done / d.size, eta = d.speed ? Math.ceil((d.size - d.done) * 1024 / d.speed / 60) : 0;
+    return `<div class="dl${d.paused ? " paused" : ""}"><i style="background-image:url(${ART[d.id].p})"></i>
+      <div><b>${dlName(d)}</b> <small>· ${d.src}${d.update ? " · atualização" : ""}</small><br><small>${d.queued ? `Na fila · ${gb(d.size)}` : d.paused ? `Pausado · ${gb(d.done)} de ${gb(d.size)}` : `${gb(d.done)} de ${gb(d.size)} · ${d.speed} MB/s · faltam ~${eta} min`}</small></div>
+      <div class="ctl">${d.queued ? `<button class="opt" data-nav data-act="dlup:${i}">Baixar agora</button>` : `<button class="opt" data-nav data-act="dlpause:${i}">${d.paused ? "Continuar" : "Pausar"}</button>`}<button class="opt danger" data-nav data-act="dlcancel:${i}">Cancelar</button></div>
+      <span class="dlbar"><i style="transform:scaleX(${p.toFixed(4)})"></i></span></div>`; };
+  $("#dlBody").innerHTML = (DL.length ? `<div class="dlsec">Baixando agora</div>${DL.filter(d => !d.queued).map(d => item(d, DL.indexOf(d))).join("") || `<p class="lib-empty">Nada baixando.</p>`}
+      ${DL.some(d => d.queued) ? `<div class="dlsec">Na fila</div>${DL.filter(d => d.queued).map(d => item(d, DL.indexOf(d))).join("")}` : ""}` : `<p class="lib-empty">Nenhum download. Jogos que você mandar instalar aparecem aqui.</p>`) +
+    `<div class="dlsec">Concluídos</div>${DLDONE.map(d => `<div class="dl"><i style="background-image:url(${ART[d.id].p})"></i><div><b>${BY[d.id].t}</b><br><small>${d.txt}</small></div><div class="ctl"><button class="opt" data-nav data-act="open" data-g="${d.id}">Ver jogo</button></div></div>`).join("")}
+    <p class="note">Steam: progresso real lido dos arquivos dela. Xbox: progresso aproximado pelo app Xbox. O download em si é feito pela loja; o hub só mostra e controla.</p>`;
+}
+function dlTick(){
+  const a = DL.find(d => !d.queued); if (!a || a.paused) return;
+  if (SET && playing && SET.tg.closeOnGame) return;
+  a.done = Math.min(a.size, a.done + a.speed / 1024 * 40);
+  if (a.done >= a.size){
+    DL.splice(DL.indexOf(a), 1); DLDONE.unshift({ id:a.id, txt:`${gb(a.size)} · agora` });
+    if (BY[a.id]) { BY[a.id].inst = true; renderLib(); }
+    notify({ kind:"dl", title:`${dlName(a)} instalado`, text:"Pronto para jogar", g:a.id });
+    const nx = DL.find(d => d.queued); if (nx){ nx.queued = false; nx.speed = 38; }
+    if (page === "vdl") renderDL();
+  }
+  renderDL();
+  if (page === "vdl"){ const f = $(`#dlBody .dl:not(.paused) .dlbar i`); }
+}
+setInterval(dlTick, 1000);
+
+/* ---------- notificações ---------- */
+const NOTIFS = [
+  { kind:"ach", title:"Conquista desbloqueada", text:"Explorador · Elden Ring · 41,6% dos jogadores", g:"elden", when:"ontem", read:true },
+  { kind:"dl", title:"Hades II atualizado", text:"Atualização 1.2 instalada", g:"hades2", when:"ontem", read:true },
+];
+const NICON = { party:'<svg class="svg" viewBox="0 0 24 24"><path d="M4 5h16v11H9l-5 4z"/></svg>', price:'<svg class="svg" viewBox="0 0 24 24"><path d="M3 12l9-9h9v9l-9 9z"/><circle cx="16" cy="8" r="1.5"/></svg>' };
+function nIcon(n){ return n.g && ART[n.g] ? `<i style="background-image:url(${ART[n.g].p})"></i>` : `<i style="background:var(--accent)">${NICON[n.kind] || ""}</i>`; }
+function notify(n){
+  n.when = "agora"; n.read = false; NOTIFS.unshift(n);
+  const nb = NOTIFS.filter(x => !x.read).length; $("#nBadge").hidden = !nb; $("#nBadge").textContent = nb;
+  const kindOn = { ach:"n_ach", dl:"n_dl", party:"n_party", music:"n_music" }[n.kind];
+  if (!SET.tg.notif || (kindOn && !SET.tg[kindOn]) || (playing && SET.tg.dnd && page === "__ingame")) return;
+  const c = document.createElement("div"); c.className = "ncard";
+  c.innerHTML = `${nIcon(n)}<div><small>${{ ach:"Conquista", dl:"Download", party:"Party", session:"Sessão", price:"Alerta de preço" }[n.kind] || "Aviso"}</small><b>${n.title}</b><span>${n.text}</span></div>`;
+  $("#ncards").prepend(c);
+  setTimeout(() => { c.classList.add("out"); setTimeout(() => c.remove(), 320); }, 4200);
+  if (overlay && overlay.id === "notifs") renderNotifs();
+}
+function renderNotifs(){
+  const nowList = NOTIFS.filter(n => n.when === "agora"), old = NOTIFS.filter(n => n.when !== "agora");
+  const it = n => `<div class="nitem${n.read ? "" : " unread"}" data-nav ${n.g ? `data-act="open" data-g="${n.g}"` : 'data-act="noop"'}>${nIcon(n)}<div><b>${n.title}</b><span>${n.text}</span></div><em>${n.when}</em></div>`;
+  $("#notifs").innerHTML = `<h3>Notificações</h3><p class="sub">${NOTIFS.length ? `${NOTIFS.filter(n => !n.read).length} novas` : "Nada por aqui"}</p>
+    ${nowList.length ? `<div class="grp">Agora</div><div class="lst">${nowList.map(it).join("")}</div>` : ""}
+    ${old.length ? `<div class="grp">Anteriores</div><div class="lst">${old.map(it).join("")}</div>` : ""}
+    <button class="opt" data-nav data-act="nclear">Limpar tudo</button>
+    <button class="opt" data-nav data-act="nsettings">Configurar notificações</button>`;
+}
+
+/* ---------- energia ---------- */
+let powerArm = null;
+function renderPower(){
+  const P = [["sleep","Suspender","O PC dorme; volta onde parou"],["restart","Reiniciar",""],["off","Desligar",""],["lock","Bloquear","Tela de bloqueio do Windows"],["desk","Sair do modo console","Esconde o hub e mostra a área de trabalho"]];
+  $("#power").innerHTML = `<h3>Energia</h3><p class="sub">${playing ? `${playing.g.t} está aberto e será fechado.` : "Nenhum jogo aberto."}</p>
+    ${P.map(([k, n, d]) => powerArm === k ? `<div class="confirm-box"><p><b>${n} o PC?</b>${playing ? " O jogo aberto será fechado." : ""}</p><div style="display:flex;gap:8px"><button class="opt danger" data-nav data-act="pwgo:${k}">${n}</button><button class="opt" data-nav data-act="pwno">Cancelar</button></div></div>`
+      : `<button class="opt${k === "off" ? " danger" : ""}" data-nav data-act="pw:${k}">${n}${d ? `<small>${d}</small>` : ""}</button>`).join("")}`;
+}
+
+/* ---------- adicionar jogo .exe ---------- */
+let addState = null;
+function openAdd(){
+  addState = { file:null, name:"", args:"", cv:0 };
+  renderAdd(); openOverlay($("#addg"));
+}
+function renderAdd(){
+  const a = addState, seedG = { id:"new" + a.name, c:["#1C2430","#3A4A63","#9FD3FF"], s:0 };
+  const opts = a.name ? [0,1,2].map(k => paint({ ...seedG, s:[2,3,5][k], id:"add" + a.name + k }, 240, 360)) : [];
+  a.opts = opts;
+  $("#addg").innerHTML = `<h3>Adicionar jogo</h3><p class="sub">Qualquer .exe, atalho ou .bat. O hub mede as horas sozinho.</p>
+    <div class="fld"><label>Executável</label><button class="opt" data-nav data-act="pickexe">${a.file ? a.file : "Escolher arquivo…"}<small>${a.file ? "trocar" : ".exe / .lnk / .bat"}</small></button></div>
+    <div class="fld"><label for="addName">Nome do jogo</label><input id="addName" data-nav value="${a.name}" placeholder="Ex.: Hollow Knight" autocomplete="off"></div>
+    ${opts.length ? `<div class="fld"><label>Capa (SteamGridDB · exemplo)</label><div class="cvpick">${opts.map((u, i) => `<button class="card cover" data-nav data-act="addcv:${i}" aria-pressed="${a.cv === i}" style="background-image:url(${u});background-size:cover"></button>`).join("")}</div></div>` : ""}
+    <div class="fld"><label for="addArgs">Argumentos (opcional)</label><input id="addArgs" data-nav value="${a.args}" placeholder="-dx12 -novid" autocomplete="off"></div>
+    <button class="btn play" data-nav data-act="addsave"${a.name ? "" : " disabled"} style="${a.name ? "" : "opacity:.5"}">Adicionar à biblioteca</button>`;
+}
+$("#exeIn").addEventListener("change", e => {
+  const f = e.target.files[0]; if (!f || !addState) return;
+  addState.file = f.name;
+  addState.name = addState.name || f.name.replace(/\.(exe|lnk|bat)$/i, "").replace(/[_\-.]+/g, " ").replace(/\b\w/g, c => c.toUpperCase());
+  renderAdd(); focusEl($('#addg [data-act="addsave"]'), false); e.target.value = "";
+});
+document.addEventListener("change", e => {
+  if (!addState) return;
+  if (e.target.id === "addName"){ addState.name = e.target.value.trim(); renderAdd(); focusEl($('#addg [data-act="addsave"]'), false); }
+  if (e.target.id === "addArgs") addState.args = e.target.value;
+});
+
+/* ---------- emuladores ---------- */
+const EMU = [["SNES","RetroArch · Snes9x",["RetroArch · Snes9x","RetroArch · bsnes"]],["GBA","RetroArch · mGBA",["RetroArch · mGBA","mGBA (standalone)"]],["PS2","PCSX2",["PCSX2"]],["GameCube / Wii","Dolphin",["Dolphin"]],["PSP","PPSSPP",["PPSSPP","RetroArch · PPSSPP"]]];
+const EMUSEL = Object.fromEntries(EMU.map(([k, d]) => [k, d]));
+
+/* ---------- erros simulados ---------- */
+const SIM = { offline:false, steam:false, fail:false };
+function applySim(){
+  $("#libErr").hidden = !SIM.steam;
+  $("#libErr").innerHTML = `<b>Steam offline.</b> Seus jogos abrem normalmente; horas e conquistas da Steam atualizam quando ela voltar.`;
+}
+
+/* ---------- primeira configuração ---------- */
+let onbStep = 0; const ONB = { restore:null, acc:{ Steam:true, Xbox:true, RetroAchievements:false, Spotify:false, Discord:false }, theme:"Automático" };
+function renderOnb(){
+  const N = 6, steps = `<div class="onb-steps">${Array.from({ length:N }, (_, i) => `<i class="${i <= onbStep ? "on" : ""}"></i>`).join("")}</div>`;
+  const nav = (next = "Continuar") => `<div class="nav2">${onbStep ? `<button class="opt" data-nav data-act="onbback">Voltar</button>` : "<span></span>"}<button class="btn play" data-nav data-act="onbnext">${next}</button></div>`;
+  const ch = (act, t, d, on) => `<button class="choice" data-nav data-act="${act}" aria-pressed="${!!on}"><b>${t}</b><small>${d}</small></button>`;
+  let h = "";
+  if (onbStep === 0) h = `<h2>Bem-vindo ao HubOS, João.</h2><p>Vamos deixar tudo pronto em menos de 2 minutos: contas, pastas de jogos e o visual. Dá para mudar tudo depois em Configurações.</p>${nav("Começar")}`;
+  if (onbStep === 1) h = `<h2>Já usou o HubOS antes?</h2><p>Se você formatou o PC, restaure o backup: horas, sessões, capas e configurações voltam, mesmo de jogos .exe em outra pasta.</p><div class="grid2">${ch("onbr:yes", "Restaurar backup", "Do OneDrive, Google Drive ou de um arquivo", ONB.restore === "yes")}${ch("onbr:no", "Começar do zero", "Primeira vez no HubOS", ONB.restore === "no")}</div>${nav()}`;
+  if (onbStep === 2) h = `<h2>Conecte suas contas</h2><p>Cada uma traz biblioteca, horas e conquistas. Nenhuma é obrigatória.</p><div class="grid2">${Object.keys(ONB.acc).map(k => ch("onba:" + k, k, ONB.acc[k] ? "Conectado ✓" : "Toque para conectar", ONB.acc[k])).join("")}</div>${nav()}`;
+  if (onbStep === 3) h = `<h2>Onde ficam seus jogos?</h2><p>Steam e Xbox o hub acha sozinho. Para .exe avulsos e ROMs, confirme as pastas:</p><div class="grid2">${SET.folders.map(f => ch("noop", f, "Será vasculhada", true)).join("")}${ch("addfolder", "+ Adicionar pasta", "Outro disco ou pasta")}</div>${nav()}`;
+  if (onbStep === 4) h = `<h2>Do seu jeito</h2><p>Tema e cor de destaque. O wallpaper você escolhe depois em Configurações.</p><div class="grid2">${["Claro","Escuro","Automático"].map(t => ch("onbt:" + t, t, t === "Automático" ? "Segue o Windows" : "", ONB.theme === t)).join("")}</div><div style="display:flex;gap:10px">${ACCENTS.map(([n, c]) => `<button class="sw" style="background:${c}" data-nav data-act="accent:${c}" aria-pressed="${SET.accent === c}" aria-label="${n}"></button>`).join("")}</div>${nav()}`;
+  if (onbStep === 5) h = `<h2>Tudo pronto.</h2><p>Encontramos <b>${GAMES.length} jogos</b>: ${GAMES.filter(g => g.src === "steam").length} da Steam, ${GAMES.filter(g => g.src === "xbox").length} do Xbox, ${GAMES.filter(g => g.src === "ra").length} de emulador, ${GAMES.filter(g => g.src === "exe").length} .exe e ${GAMES.filter(g => g.src === "epic").length} da Epic. As capas estão sendo baixadas.</p>${nav("Ir para o início")}`;
+  $("#onb").innerHTML = `<div class="onb-card">${steps}${h}</div>`;
+}
+function openOnb(){ onbStep = 0; renderOnb(); $("#onb").hidden = false; prevFocus = cur; overlay = $("#onb"); focusEl($("#onb [data-act='onbnext']"), false); }
+
 let page = "v1";
 const navStack = [];
 function go(id, push = false, focusTarget = null){
@@ -1523,7 +1784,7 @@ function go(id, push = false, focusTarget = null){
   $("#bd").hidden = !(id === "v1" || id === "vgame" || id === "vsgame");
   if (id === "v1" && heroGame){ bdGame = null; setBackdrop(heroGame); }
   main.scrollTop = 0;
-  const HERE = { v1:"home", vapps:"go:apps", vgames:"go:games", vgame:"go:games", vstats:"go:stats", vset:"go:settings", vprof:"", vstore:"go:store", vsgame:"go:store" };
+  const HERE = { v1:"home", vapps:"go:apps", vgames:"go:games", vgame:"go:games", vstats:"go:stats", vset:"go:settings", vprof:"", vstore:"go:store", vsgame:"go:store", vdl:"go:dl" };
   rail.querySelectorAll(".ri").forEach(r => r.classList.toggle("here", r.dataset.act === HERE[id]));
   const rem = lastInView[id] && lastInView[id].isConnected ? lastInView[id] : null;
   focusEl(focusTarget || rem || $("#" + id + " [data-nav]"));
@@ -1657,13 +1918,17 @@ function closeOverlay(instant){
 }
 let launchTimer = 0;
 function launch(g){
+  $("#m-ok").textContent = "Voltar ao hub";
+  if (playing && playing.g !== g){ toast(`Feche ${playing.g.t} antes de abrir outro jogo`); return; }
+  if (playing && playing.g === g) return toast(`${g.t} trazido para frente`);
   $("#m-art").style.backgroundImage = `url(${ART[g.id].l})`;
   $("#m-title").textContent = g.t;
   $("#m-txt").textContent = `Abrindo pela ${g.src === "ra" ? "RetroArch (" + g.plat + ")" : g.src === "exe" ? "executável direto" : SRC[g.src]}, em tela cheia…`;
   const pr = $("#m-prog"); pr.classList.remove("run"); void pr.offsetWidth; pr.classList.add("run");
   openOverlay($("#launch"));
   clearTimeout(launchTimer);
-  launchTimer = setTimeout(() => { $("#m-txt").textContent = "Em jogo. No PC de verdade o hub sairia da frente agora. Guide, Alt+Tab ou Ctrl+Alt+H trazem ele de volta, com a sessão sendo cronometrada."; }, 1700);
+  if (SIM.fail && g.id === "halo"){ launchTimer = setTimeout(() => { $("#m-prog").classList.remove("run"); $("#m-txt").innerHTML = "<b>Halo Infinite não abriu.</b> O app Xbox não respondeu em 30 s. Tente de novo ou abra o app Xbox para ver se há atualização pendente."; $("#m-ok").textContent = "Fechar"; }, 1700); return; }
+  launchTimer = setTimeout(() => { playing = { g, start:Date.now(), offset:0 }; renderNow(); $("#m-txt").textContent = "Em jogo. No PC de verdade o hub sairia da frente agora. Volte com Guide, Alt+Tab ou Ctrl+Alt+H: a home mostra o jogo aberto, com Voltar ao jogo e Fechar jogo."; }, 1700);
 }
 
 let toastT = 0;
@@ -1679,6 +1944,39 @@ function activate(el){
   if (act === "go:apps"){ navStack.length = 0; return go("vapps"); }
   if (act === "go:games"){ navStack.length = 0; return go("vgames"); }
   if (act === "noop") return;
+  if (act === "resume") return toast(`${playing.g.t} trazido para frente`);
+  if (act === "quitgame") return quitGame();
+  if (act === "nowchip"){ navStack.length = 0; go("v1"); return focusEl($('#nowBar [data-act="resume"]')); }
+  if (act === "go:dl"){ navStack.length = 0; go("vdl"); renderDL(); const f = $("#dlBody [data-nav]"); if (f) focusEl(f); return; }
+  if (act.startsWith("dlpause:")){ const d = DL[+act.slice(8)]; d.paused = !d.paused; renderDL(); return focusEl($(`#dlBody [data-act="${act}"]`), false); }
+  if (act.startsWith("dlcancel:")){ const d = DL.splice(+act.slice(9), 1)[0]; if (!DL.some(x => !x.queued) && DL.length){ DL[0].queued = false; DL[0].speed = 38; } renderDL(); toast(`Download de ${dlName(d)} cancelado`); const f = $("#dlBody [data-nav]"); if (f) focusEl(f); return; }
+  if (act.startsWith("dlup:")){ const i = +act.slice(5), cur2 = DL.find(x => !x.queued); if (cur2){ cur2.queued = true; cur2.speed = 0; } const d = DL.splice(i, 1)[0]; d.queued = false; d.speed = 40; DL.unshift(d); renderDL(); const f = $("#dlBody [data-nav]"); if (f) focusEl(f); return; }
+  if (act === "notifs"){ NOTIFS.forEach(n => n.read = n.read); renderNotifs(); openOverlay($("#notifs")); NOTIFS.forEach(n => n.read = true); $("#nBadge").hidden = true; return; }
+  if (act === "nclear"){ NOTIFS.length = 0; renderNotifs(); return focusEl($('#notifs [data-act="nsettings"]'), false); }
+  if (act === "nsettings"){ closeOverlay(true); navStack.length = 0; go("vset"); showSec("notif"); return focusEl($("#setbody [data-nav]")); }
+  if (act === "power"){ if (overlay === rail) closeOverlay(true); powerArm = null; renderPower(); return openOverlay($("#power")); }
+  if (act.startsWith("pw:")){ powerArm = act.slice(3); if (powerArm === "lock" || powerArm === "desk"){ const k = powerArm; powerArm = null; closeOverlay(); return toast(k === "lock" ? "PC bloqueado" : "Hub escondido. Guide ou Ctrl+Alt+H trazem de volta"); } renderPower(); return focusEl($(`#power [data-act="pwgo:${powerArm}"]`), false); }
+  if (act === "pwno"){ const k = powerArm; powerArm = null; renderPower(); return focusEl($(`#power [data-act="pw:${k}"]`), false); }
+  if (act.startsWith("pwgo:")){ const k = act.slice(5); powerArm = null; closeOverlay(); if (playing){ playing = null; renderNow(); } return toast({ sleep:"Suspendendo…", restart:"Reiniciando…", off:"Desligando…" }[k] + " (no protótipo nada acontece)"); }
+  if (act === "addgame") return openAdd();
+  if (act === "pickexe"){ $("#exeIn").click(); return; }
+  if (act.startsWith("addcv:")){ addState.cv = +act.slice(6); renderAdd(); return focusEl($(`#addg [data-act="${act}"]`), false); }
+  if (act === "addsave"){
+    if (!addState.name) return toast("Dê um nome ao jogo");
+    const id = "x" + Date.now().toString(36), g = { id, t:addState.name, src:"exe", h:0, last:"Nunca jogado", rank:-1, c:["#1C2430","#3A4A63","#9FD3FF"], s:2, dev:"—", y:"—", gen:"—", sz:"—", d:`Adicionado por você${addState.file ? ` (${addState.file})` : ""}. Horas e sessões medidas pelo hub.` };
+    GAMES.push(g); BY[id] = g; ART[id] = { p: addState.opts[addState.cv] || paint(g, 360, 540), l: paint(g, 1120, 630) };
+    const st = document.createElement("style"); st.textContent = `.g-${id}{--p:url(${ART[id].p});--l:url(${ART[id].l})}`; document.head.appendChild(st);
+    addState = null; closeOverlay(); renderTabs(); renderLib(); toast(`${g.t} adicionado à biblioteca`); return;
+  }
+  if (act.startsWith("emu:")){ const [, k, v] = act.split(":"); EMUSEL[k] = v; showSec("lib", act); return toast(`${k} abre no ${v}`); }
+  if (act === "onb"){ return openOnb(); }
+  if (act === "onbnext"){ if (onbStep >= 5){ overlay = null; $("#onb").hidden = true; navStack.length = 0; go("v1"); return toast("Bem-vindo ao HubOS"); } onbStep++; renderOnb(); return focusEl($("#onb [data-act='onbnext']"), false); }
+  if (act === "onbback"){ onbStep = Math.max(0, onbStep - 1); renderOnb(); return focusEl($("#onb [data-act='onbnext']"), false); }
+  if (act.startsWith("onbr:")){ ONB.restore = act.slice(5); renderOnb(); if (ONB.restore === "yes") toast("Backup encontrado no OneDrive: 15 jogos, 2.671 h"); return focusEl($(`#onb [data-act="${act}"]`), false); }
+  if (act.startsWith("onba:")){ const k = act.slice(5); ONB.acc[k] = !ONB.acc[k]; renderOnb(); return focusEl($(`#onb [data-act="${act}"]`), false); }
+  if (act.startsWith("onbt:")){ ONB.theme = SET.theme = act.slice(5); applyTheme(); renderOnb(); return focusEl($(`#onb [data-act="${act}"]`), false); }
+  if (act === "splash"){ const sp = $("#splash"); sp.classList.remove("gone"); sp.hidden = false; void sp.offsetWidth; setTimeout(() => sp.classList.add("gone"), 1400); return; }
+  if (act.startsWith("sim:")){ const k = act.slice(4); SIM[k] = !SIM[k]; el.setAttribute("aria-checked", SIM[k]); applySim(); renderStore(); return; }
   if (act === "go:store"){ navStack.length = 0; renderStore(); return go("vstore"); }
   if (act.startsWith("sopen:")) return openStoreGame(act.slice(6));
   if (act === "steamstore") return toast("Loja da Steam aberta no app da Steam (já pré-aberto)");
@@ -1690,9 +1988,9 @@ function activate(el){
   if (act.startsWith("tg:")){ const k = act.slice(3); SET.tg[k] = !SET.tg[k]; el.setAttribute("aria-checked", SET.tg[k]); if (k.startsWith("app_")) showSec("apps", act); return; }
   if (act === "lite"){ SET.lite = !SET.lite; el.setAttribute("aria-checked", SET.lite); document.body.classList.toggle("lite", SET.lite); return; }
   if (act.startsWith("rd:")){ const [, k, v] = act.split(":"); SET[k] = v; if (k === "theme" || k === "anim") applyTheme(); if (k === "wall"){ if (v === "Imagem minha" && !SET.wallImg){ fileTarget = "wall"; $("#fileIn").click(); } bdGame = null; setBackdrop(heroGame); } showSec(secCur, act); return; }
-  if (act.startsWith("accent:")){ SET.accent = act.slice(7); applyTheme(); showSec("look", act); return; }
+  if (act.startsWith("accent:")){ SET.accent = act.slice(7); applyTheme(); if (overlay && overlay.id === "onb"){ renderOnb(); return focusEl($(`#onb [data-act="${act}"]`), false); } showSec("look", act); return; }
   if (act === "wallpick"){ fileTarget = "wall"; $("#fileIn").click(); return; }
-  if (act === "addfolder"){ SET.folders.push("E:\\Jogos antigos"); showSec("lib", "addfolder"); return toast("Pasta adicionada (exemplo). O hub vasculharia os executáveis."); }
+  if (act === "addfolder"){ SET.folders.push("E:\\Jogos antigos"); if (overlay && overlay.id === "onb"){ renderOnb(); return focusEl($("#onb [data-act='onbnext']"), false); } showSec("lib", "addfolder"); return toast("Pasta adicionada (exemplo). O hub vasculharia os executáveis."); }
   if (act.startsWith("rmfolder:")){ SET.folders.splice(+act.slice(9), 1); showSec("lib"); focusEl($("#setbody [data-nav]")); return; }
   if (act.startsWith("sout:")){ SET.out = act.slice(5); state.out = SET.out; renderAudio(); showSec("audio", act); return toast("Saída trocada pelo AudioHub"); }
   if (act.startsWith("eqp:")){ const [, cat, n] = act.split(":"); SET.eq = [...AH_PRESETS[cat][n]]; SET.eqName = n; if (PRESETS.includes(n)){ state.preset = n; renderAudio(); } showSec("audio", act); return toast(`Preset ${n} aplicado pelo AudioHub`); }
@@ -1710,7 +2008,7 @@ function activate(el){
   if (act.startsWith("f:")){ libF = +act.slice(2); renderLib(); return; }
   if (act === "sort"){ libS = (libS + 1) % SORTS.length; renderLib(); return; }
   if (act.startsWith("tab:")){ gTab = +act.slice(4); return renderGTab(); }
-  if (act === "g:play"){ if (gCur.inst === false) return toast(`${SRC[gCur.src]} abriu a confirmação de instalação. O progresso aparece em Downloads.`); return launch(gCur); }
+  if (act === "g:play"){ if (gCur.inst === false){ if (!DL.some(d => d.id === gCur.id)) DL.push({ id:gCur.id, size:parseFloat(String(gCur.sz).replace(",", ".")) || 10, done:0, speed:0, src:SRC[gCur.src], queued:true }); if (!DL.some(d => !d.queued)){ DL[DL.length - 1].queued = false; DL[DL.length - 1].speed = 40; } renderDL(); return toast(`${gCur.t} entrou na fila de Downloads`); } return launch(gCur); }
   if (act === "g:fav"){ gCur.fav = !gCur.fav; el.classList.toggle("on", !!gCur.fav); el.textContent = gCur.fav ? "♥ Favorito" : "♡ Favoritar"; renderTabs(); renderLib(); return toast(gCur.fav ? "Adicionado aos favoritos" : "Removido dos favoritos"); }
   if (act === "g:opts") return openOpts();
   if (act === "menu") return openMenu();
@@ -1738,7 +2036,7 @@ function activate(el){
   if (act.startsWith("preset:")){ state.preset = act.slice(7); renderAudio(); focusEl($(`#presets [data-act="${act}"]`), false); return toast(`Preset ${state.preset} aplicado`); }
   if (act.startsWith("toast:")){ if (overlay === rail) closeOverlay(); return toast(act.slice(6)); }
 }
-function back(){ if (cur && cur.classList && cur.classList.contains("editing")){ cur.classList.remove("editing"); return; } if (overlay){ if (overlay.id === "cvsheet") review = null; closeOverlay(); } else if (cur && cur.closest("#rail")) focusEl(lastInView[page] || $("#" + page + " [data-nav]")); else if (navStack.length) go(navStack.pop()); else if (page !== "v1") go("v1"); }
+function back(){ if (cur && cur.classList && cur.classList.contains("editing")){ cur.classList.remove("editing"); return; } if (overlay && overlay.id === "onb"){ if (onbStep){ onbStep--; renderOnb(); focusEl($("#onb [data-act='onbnext']"), false); } return; } if (overlay){ if (overlay.id === "cvsheet") review = null; closeOverlay(); } else if (cur && cur.closest("#rail")) focusEl(lastInView[page] || $("#" + page + " [data-nav]")); else if (navStack.length) go(navStack.pop()); else if (page !== "v1") go("v1"); }
 
 /* ---------------- entrada: mouse ---------------- */
 let lastPX = -1, lastPY = -1;
@@ -1823,6 +2121,11 @@ try { if (navigator.getGamepads && [...navigator.getGamepads()].some(Boolean)) s
 const clock = () => $("#clock").textContent = new Date().toLocaleTimeString("pt-BR", { hour:"2-digit", minute:"2-digit" });
 clock(); setInterval(clock, 15000);
 setHero(byRecent[0]);
+setTimeout(() => $("#splash").classList.add("gone"), 1300);
+setTimeout(() => { $("#splash").hidden = true; }, 1900);
+setTimeout(() => notify({ kind:"party", title:"Rafa entrou na party", text:"Squad do CS · 4 na call" }), 7000);
+setTimeout(() => notify({ kind:"price", title:"Sekiro abaixo do seu alerta?", text:"Ainda não: R$ 162,40 na Green Man Gaming (alerta R$ 120)" }), 16000);
+renderDL();
 setMenuMode("drawer", false);
 focusEl($("#v1-row [data-nav]"), false);
 })();

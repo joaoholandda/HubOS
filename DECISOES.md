@@ -66,5 +66,12 @@
 | 47 | Perfil | DECIDIDO | Nome "João Holanda"; avatar da Steam/Xbox; banner com imagem própria; sem XP próprio (mostra nível Steam, Gamerscore Xbox, pontos RA); sem medalhas; vitrine (jogando agora, 5 favoritos, conquistas raras, recordes, música favorita); contas com copiar/abrir; resumo + linha do tempo de atividade | 2026-11-10 |
 | 48 | Loja | DECIDIDO | Comparador entre lojas (Steam, Xbox, GOG, Epic, lojas de chave); início com Recomendados + Promoções + Lista de desejos; atalho fácil para a loja da Steam; desejos Steam + hub | 2026-11-10 |
 | 49 | Loja: extras | DECIDIDO | Alerta de preço, histórico de preço, imagens/trailer, Metacritic e HowLongToBeat (com custo por hora) na página do jogo | 2026-11-10 |
-| 50 | Repositório | DECIDIDO (aguardando criação) | GitHub novo e privado: HubOS | 2026-11-10 |
+| 50 | Repositório | DECIDIDO | github.com/joaoholandda/HubOS (privado) | 2026-11-10 |
+| 51 | Estado "em jogo" | DECIDIDO (padrão proposto) | Faixa na home + chip na barra com tempo de sessão; Voltar ao jogo / Fechar jogo (confirma 2x) | 2026-11-10 |
+| 52 | Downloads | DECIDIDO (padrão proposto) | Tela com baixando/fila/concluídos; pausar, priorizar, cancelar; chip de % na barra; Instalar coloca na fila | 2026-11-10 |
+| 53 | Notificações | DECIDIDO (padrão proposto) | Cartões no canto superior direito + central (sino com contador) | 2026-11-10 |
+| 54 | Energia | DECIDIDO (padrão proposto) | Suspender, reiniciar, desligar (com confirmação), bloquear, sair do modo console | 2026-11-10 |
+| 55 | Adicionar .exe | DECIDIDO (padrão proposto) | Escolher arquivo, nome automático, capa entre opções, argumentos | 2026-11-10 |
+| 56 | Primeira configuração | DECIDIDO (padrão proposto) | 6 passos: boas-vindas, restaurar backup, contas, pastas, aparência, pronto | 2026-11-10 |
+| 57 | Abertura, erros, emuladores | DECIDIDO (padrão proposto) | Splash curto; avisos de offline/Steam fora/jogo não abriu; emulador por console em Biblioteca | 2026-11-10 |
 | 8 | Firefox / apps instantâneos | DECIDIDO | Mantém o app aberto e escondido; ao clicar, só traz a janela para frente | 2026-11-10 |
