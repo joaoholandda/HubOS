@@ -105,7 +105,10 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 }
 .btn.primary { background: var(--ink); color: var(--bg); }
 /* Botões do controle: monocromáticos, só o contorno na cor do texto. */
-.g { display: inline-grid; place-items: center; width: 22px; height: 22px; border-radius: var(--r-pill); border: 1.5px solid currentColor; font: 700 10.5px var(--body); opacity: 0.85; }
+.g { display: none; align-items: center; justify-content: center; flex: none; width: 22px; height: 22px; box-sizing: border-box; border-radius: var(--r-pill); border: 1.5px solid currentColor; font: 700 11px / 1 var(--body); letter-spacing: 0; text-align: center; opacity: 0.85; }
+:root[data-input="pad"] .g { display: inline-flex; }
+.bumper { display: none; }
+:root[data-input="pad"] .bumper { display: inline-block; }
 
 .hero-col { align-self: end; display: grid; gap: 18px; }
 .hero-col .hero-info { align-self: auto; }
@@ -343,3 +346,9 @@ button.rowline { width: 100%; text-align: left; font: inherit; color: inherit; a
 .cover:has(.fav-tag) .src-tag { max-width: calc(100% - 52px); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .group .btn { background: var(--surface-2); }
 .mbtn svg { stroke-width: 1.5; }
+
+/* ---------- conquistas ---------- */
+.meter { height: 10px; border-radius: var(--r-pill); background: var(--line); overflow: hidden; margin-bottom: 18px; }
+.meter i { display: block; height: 100%; background: var(--accent); transform-origin: left; }
+.ach.locked b { font-weight: 500; color: var(--ink-2); }
+.ach > span:last-child { flex: none; }

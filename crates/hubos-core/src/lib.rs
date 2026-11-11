@@ -8,6 +8,7 @@ pub mod model;
 pub mod sessions;
 pub mod sgdb;
 pub mod steam;
+pub mod steamweb;
 pub mod vdf;
 pub mod xbox;
 

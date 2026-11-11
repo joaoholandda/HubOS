@@ -16,11 +16,18 @@ const REPEAT_FAST = 95;
 const REPEAT_FASTER = 55;
 const STICK = 0.55;
 
+/** Marca na página qual entrada está em uso: as letras do controle só aparecem com "pad". */
+function setMode(mode: "pad" | "kbm") {
+  const root = document.documentElement;
+  if (root.dataset.input !== mode) root.dataset.input = mode;
+}
+
 export function useInput(onAction: (a: Action) => void, onPadChange?: (connected: boolean) => void) {
   useEffect(() => {
     const isTyping = (t: EventTarget | null) => (t instanceof HTMLInputElement && t.type !== "range") || t instanceof HTMLTextAreaElement;
 
     const onKey = (e: KeyboardEvent) => {
+      setMode("kbm");
       if (isTyping(e.target)) {
         if (e.key === "Escape") onAction("back");
         if (e.key === "ArrowUp" || e.key === "ArrowDown") {
@@ -68,6 +75,7 @@ export function useInput(onAction: (a: Action) => void, onPadChange?: (connected
       if (e.clientX === lastX && e.clientY === lastY) return;
       lastX = e.clientX;
       lastY = e.clientY;
+      setMode("kbm");
       const el = (e.target as HTMLElement | null)?.closest<HTMLElement>("[data-nav]");
       if (el && el !== focusEngine.current && focusEngine.candidates().includes(el)) focusEngine.focus(el, { scroll: false });
     };
@@ -106,6 +114,7 @@ export function useInput(onAction: (a: Action) => void, onPadChange?: (connected
       if (!document.hidden && document.hasFocus()) {
         const b = (i: number) => !!pad.buttons[i]?.pressed;
         const ax = (i: number) => pad.axes[i] ?? 0;
+        if (pad.buttons.some((x) => x.pressed) || Math.abs(ax(0)) > STICK || Math.abs(ax(1)) > STICK) setMode("pad");
         dirInput("up", b(PAD.UP) || ax(1) < -STICK, t);
         dirInput("down", b(PAD.DOWN) || ax(1) > STICK, t);
         dirInput("left", b(PAD.LEFT) || ax(0) < -STICK, t);

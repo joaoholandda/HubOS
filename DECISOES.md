@@ -86,3 +86,9 @@
 | 66 | Perfil (1ª versão) | DECIDIDO | Só dados locais: resumo, favoritos, recordes e atividade recente. Avatar/banner e níveis Steam/Xbox/RA entram com as contas | 2026-11-10 |
 | 67 | Diagnóstico | DECIDIDO | Configurações › Diagnóstico mostra o que foi achado, se o atalho e o Guide funcionam e o diário (`hubos.log`), com botão de copiar | 2026-11-10 |
 | 68 | Menu: itens provisórios | DECIDIDO | Party abre o Discord, Downloads abre os downloads da Steam, Claude e Arquivos abrem os programas. Loja e Áudio seguem como "em breve" | 2026-11-10 |
+| 69 | Clique nas capas | DECIDIDO | Uso principal é teclado e mouse: um clique só seleciona; jogar é pelo botão Jogar, por dois cliques ou por Enter / A | 2026-11-11 |
+| 70 | Letras do controle | DECIDIDO | A, X, Y, LB e RB só aparecem na tela depois que o controle for usado; somem ao usar mouse ou teclado | 2026-11-11 |
+| 71 | Biblioteca completa da Steam | DECIDIDO | Com chave da Steam (grátis, colada em Configurações): mostra jogos não instalados e conquistas. Início mostra só os instalados; Jogos mostra tudo | 2026-11-11 |
+| 72 | Navegador | DECIDIDO | Navegador próprio dentro do hub (não é o Firefox; login feito uma vez nele) | 2026-11-11 |
+| 73 | Party do Discord | DECIDIDO | Dentro do hub, controlando o Discord do PC por um aplicativo do Discord criado pelo dono (Client ID e Secret colados em Configurações) | 2026-11-11 |
+| 74 | AudioHub | ADIADO | Integração fica para depois, a pedido | 2026-11-11 |

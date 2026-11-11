@@ -5,7 +5,10 @@ import { Img } from "./Img";
 
 interface Props {
   game: Game;
+  /** Enter / A do controle, ou um clique quando não há `onPlay`. */
   onOpen: (g: Game) => void;
+  /** Quando existe: um clique do mouse só seleciona; dois cliques chamam isto. */
+  onPlay?: (g: Game) => void;
   /** Primeiro item da tela: recebe o foco ao entrar. */
   isDefault?: boolean;
   /** Mostra a estrela de favorito. */
@@ -13,7 +16,7 @@ interface Props {
 }
 
 /** Capa 2:3. `memo`: navegar pela fileira não re-renderiza as capas. */
-export const GameCard = memo(function GameCard({ game, onOpen, isDefault, fav }: Props) {
+export const GameCard = memo(function GameCard({ game, onOpen, onPlay, isDefault, fav }: Props) {
   const [a, b] = tint(game.id);
   return (
     <button
@@ -22,7 +25,9 @@ export const GameCard = memo(function GameCard({ game, onOpen, isDefault, fav }:
       data-game={game.id}
       {...(isDefault ? { "data-nav-default": "" } : {})}
       aria-label={game.title}
-      onClick={() => onOpen(game)}
+      // `detail` é 0 quando o "clique" veio do teclado ou do controle.
+      onClick={(e) => (onPlay && e.detail > 0 ? undefined : onOpen(game))}
+      onDoubleClick={onPlay ? () => onPlay(game) : undefined}
       style={{ background: `linear-gradient(160deg, ${a}, ${b})` }}
     >
       {/* Título por baixo: aparece se a imagem não existir ou não carregar. */}

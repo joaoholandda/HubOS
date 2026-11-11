@@ -23,6 +23,14 @@ pub struct Settings {
     /// Cor de destaque em hexadecimal.
     #[serde(default)]
     pub accent: Option<String>,
+    /// Chave da API da Steam (biblioteca completa e conquistas).
+    #[serde(default)]
+    pub steam_key: Option<String>,
+    /// Aplicativo do Discord criado pelo dono do hub (para a Party).
+    #[serde(default)]
+    pub discord_id: Option<String>,
+    #[serde(default)]
+    pub discord_secret: Option<String>,
 }
 
 pub fn save_settings(app: &AppHandle, s: &Settings) -> Result<(), String> {

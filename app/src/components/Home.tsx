@@ -92,7 +92,7 @@ const Row = memo(function Row({ games, onOpen, favorites }: { games: Game[]; onO
   return (
     <div className="row" data-nav-row>
       {games.map((g) => (
-        <GameCard key={g.id} game={g} onOpen={onOpen} fav={favorites.includes(g.id)} />
+        <GameCard key={g.id} game={g} onOpen={onOpen} onPlay={onOpen} fav={favorites.includes(g.id)} />
       ))}
     </div>
   );

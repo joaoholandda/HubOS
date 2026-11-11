@@ -6,6 +6,7 @@ mod covers;
 mod custom;
 mod log;
 mod media;
+mod steamweb;
 mod system;
 mod xbox;
 
@@ -67,6 +68,8 @@ async fn get_library(app: tauri::AppHandle) -> Result<Library, String> {
             }
             None => warnings.push("Steam não encontrada neste PC.".into()),
         }
+        // Jogos da conta que não estão instalados (lista guardada da última busca).
+        steamweb::merge_cached(&app, &mut games);
         match xbox::scan(&app) {
             Ok(found) => games.extend(found),
             Err(e) => warnings.push(format!("Xbox: {e}")),
@@ -220,6 +223,7 @@ fn get_all_sessions(app: tauri::AppHandle) -> Vec<hubos_core::sessions::Session>
 #[serde(rename_all = "camelCase")]
 struct SettingsView {
     has_sgdb_key: bool,
+    has_steam_key: bool,
     theme: String,
     accent: Option<String>,
     autostart: bool,
@@ -232,6 +236,7 @@ fn get_settings(app: tauri::AppHandle) -> SettingsView {
     let s = covers::settings(&app);
     SettingsView {
         has_sgdb_key: s.sgdb_key.is_some(),
+        has_steam_key: s.steam_key.is_some(),
         theme: s.theme.unwrap_or_else(|| "auto".into()),
         accent: s.accent,
         autostart: app.autolaunch().is_enabled().unwrap_or(false),
@@ -247,6 +252,7 @@ fn set_setting(app: tauri::AppHandle, key: String, value: String) -> Result<(), 
     match key.as_str() {
         "theme" => s.theme = Some(value),
         "accent" => s.accent = (!value.is_empty()).then_some(value),
+        "steamKey" => s.steam_key = Some(value.trim().to_string()).filter(|v| !v.is_empty()),
         "autostart" => {
             let r = if value == "true" { app.autolaunch().enable() } else { app.autolaunch().disable() };
             return r.map_err(|e| e.to_string());
@@ -321,6 +327,23 @@ async fn media_art() -> Option<String> {
 #[tauri::command]
 async fn media_control(action: String) -> Result<(), String> {
     tauri::async_runtime::spawn_blocking(move || media::control(&action)).await.map_err(|e| e.to_string())?
+}
+
+/// Atualiza a lista de jogos da conta Steam. Devolve quantos jogos a conta tem.
+#[tauri::command]
+async fn refresh_steam(app: tauri::AppHandle) -> Result<usize, String> {
+    let r = steamweb::refresh(&app, find_steam_root().as_deref()).await;
+    match &r {
+        Ok(n) => log::log(format!("conta Steam: {n} jogos")),
+        Err(e) => log::log(format!("conta Steam FALHOU: {e}")),
+    }
+    r
+}
+
+/// Conquistas de um jogo da Steam.
+#[tauri::command]
+async fn steam_achievements(app: tauri::AppHandle, appid: u32) -> Result<hubos_core::steamweb::Achievements, String> {
+    steamweb::achievements(&app, find_steam_root().as_deref(), appid).await
 }
 
 /// Jogo rodando agora, para a interface saber ao (re)abrir.
@@ -447,7 +470,7 @@ pub fn run() {
         .manage(console::ConsoleState::default())
         .manage(xbox::XboxState::default())
         .manage(ScanState::default())
-        .invoke_handler(tauri::generate_handler![get_library, launch_game, open_external, close_game, power, add_exe_game, remove_game, rename_game, get_apps, add_app, remove_app, open_app, get_all_sessions, get_settings, set_setting, get_game_state, hide_hub, get_sessions, has_sgdb_key, set_sgdb_key, cover_options, set_cover, reset_cover, get_diagnostics, open_data_dir, open_files, get_favorites, toggle_favorite, get_media, media_art, media_control])
+        .invoke_handler(tauri::generate_handler![get_library, launch_game, open_external, close_game, power, add_exe_game, remove_game, rename_game, get_apps, add_app, remove_app, open_app, get_all_sessions, get_settings, set_setting, get_game_state, hide_hub, get_sessions, has_sgdb_key, set_sgdb_key, cover_options, set_cover, reset_cover, get_diagnostics, open_data_dir, open_files, get_favorites, toggle_favorite, get_media, media_art, media_control, refresh_steam, steam_achievements])
         .setup(move |app| {
             // Em desenvolvimento, abre em janela para não prender a tela.
             #[cfg(debug_assertions)]

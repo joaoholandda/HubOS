@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Diagnostics } from "./Diagnostics";
-import { applyAppearance, getSettings, setSetting, setSgdbKey, type Settings } from "../lib/api";
+import { applyAppearance, getSettings, refreshSteam, setSetting, setSgdbKey, type Settings } from "../lib/api";
 
 const THEMES: { id: Settings["theme"]; label: string }[] = [
   { id: "light", label: "Claro" },
@@ -21,6 +21,8 @@ const ACCENTS = [
 export function SettingsPage({ toast, onRescan }: { toast: (m: string) => void; onRescan: () => Promise<void> }) {
   const [s, setS] = useState<Settings | null>(null);
   const [key, setKey] = useState("");
+  const [steamKey, setSteamKey] = useState("");
+  const [busy, setBusy] = useState(false);
   useEffect(() => {
     getSettings().then(setS);
   }, []);
@@ -120,6 +122,37 @@ export function SettingsPage({ toast, onRescan }: { toast: (m: string) => void; 
           <div className="lb">
             <b>Steam</b>
             <small>{s.steamRoot ?? "Não encontrada neste PC."}</small>
+          </div>
+        </div>
+        <div className="srow">
+          <div className="lb">
+            <b>Chave da Steam</b>
+            <small>{s.hasSteamKey ? "Chave salva: a biblioteca mostra todos os jogos da conta e as conquistas." : "Sem chave, só aparecem os jogos instalados. É grátis: steamcommunity.com/dev/apikey (domínio: localhost)."}</small>
+          </div>
+          <div className="ctl">
+            <input className="field" data-nav value={steamKey} onChange={(e) => setSteamKey(e.target.value)} placeholder="Cole a chave" spellCheck={false} />
+            <button
+              className="btn"
+              data-nav
+              disabled={busy || (!steamKey.trim() && !s.hasSteamKey)}
+              onClick={async () => {
+                setBusy(true);
+                try {
+                  if (steamKey.trim()) await setSetting("steamKey", steamKey);
+                  setSteamKey("");
+                  setS(await getSettings());
+                  const n = await refreshSteam();
+                  await onRescan();
+                  toast(`Conta Steam: ${n} jogos`);
+                } catch (e) {
+                  toast(String(e));
+                } finally {
+                  setBusy(false);
+                }
+              }}
+            >
+              {busy ? "Buscando…" : steamKey.trim() ? "Salvar" : "Atualizar"}
+            </button>
           </div>
         </div>
       </div>

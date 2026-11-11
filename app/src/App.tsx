@@ -1,5 +1,5 @@
-import { useCallback, useEffect, useRef, useState } from "react";
-import { addExeGame, applyAppearance, closeGame, getFavorites, getGameState, getLibrary, getSettings, hideHub, inTauri, launchGame, onGameState, openApp, openFiles, openUrl, toggleFavorite, type Game, type Library, type RunningGame } from "./lib/api";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { addExeGame, applyAppearance, closeGame, getFavorites, getGameState, getLibrary, getSettings, hideHub, refreshSteam, inTauri, launchGame, onGameState, openApp, openFiles, openUrl, toggleFavorite, type Game, type Library, type RunningGame } from "./lib/api";
 import { totalHours } from "./lib/format";
 import { focusEngine } from "./nav/focus";
 import { useInput, type Action } from "./nav/input";
@@ -47,7 +47,17 @@ export default function App() {
 
   // Tema e cor de destaque salvos.
   useEffect(() => {
-    getSettings().then(applyAppearance).catch(() => {});
+    getSettings()
+      .then((s) => {
+        applyAppearance(s);
+        // Com chave da Steam: atualiza a lista da conta em segundo plano.
+        if (s.hasSteamKey && inTauri)
+          refreshSteam()
+            .then(() => getLibrary())
+            .then(setLib)
+            .catch((e) => console.warn("[HubOS]", e));
+      })
+      .catch(() => {});
   }, []);
   const [toastNode, toast] = useToast();
   const mediaState = useMedia(toast);
@@ -171,8 +181,12 @@ export default function App() {
 
   const play = useCallback(
     async (g: Game) => {
-      if (!g.installed) return toast(`${g.title} não está instalado. Downloads chegam na próxima etapa.`);
       try {
+        if (!g.installed) {
+          if (g.source !== "steam") return toast(`${g.title} não está instalado.`);
+          await launchGame(g);
+          return toast(`${g.title}: a Steam vai abrir para instalar.`);
+        }
         if (running && running.id !== g.id) return toast("Feche o jogo aberto antes de abrir outro.");
         if (running?.id === g.id) return hideHub();
         await launchGame(g);
@@ -228,7 +242,12 @@ export default function App() {
     setLib((l) => (l ? { ...l, games: l.games.map((x) => (x.id === g.id ? { ...x, coverPath: path } : x)) } : l));
   }, []);
 
-  const games = lib?.games ?? [];
+  const games = useMemo(() => lib?.games ?? [], [lib]);
+  // Início mostra só o que dá para jogar agora; a biblioteca completa fica em Jogos.
+  const homeGames = useMemo(() => {
+    const inst = games.filter((g) => g.installed);
+    return inst.length ? inst : games;
+  }, [games]);
   const pageGame = route.page === "game" ? games.find((g) => g.id === route.id) : undefined;
   const runningGame = running ? games.find((g) => g.id === running.id) : undefined;
   const banner = running ? (
@@ -280,7 +299,7 @@ export default function App() {
         ) : route.page === "game" && pageGame ? (
           <GamePage game={pageGame} onPlay={play} onCover={setCoverFor} fav={favorites.includes(pageGame.id)} onFav={toggleFav} />
         ) : (
-          <Home games={games} onPlay={play} onDetails={details} onCover={setCoverFor} onFocusGame={setFocused} banner={banner} favorites={favorites} />
+          <Home games={homeGames} onPlay={play} onDetails={details} onCover={setCoverFor} onFocusGame={setFocused} banner={banner} favorites={favorites} />
         )}
       </main>
       <Drawer open={drawer} current={route.page === "game" ? "games" : route.page} onPick={pick} onClose={closeDrawer} />

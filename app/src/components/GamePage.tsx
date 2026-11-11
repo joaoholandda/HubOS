@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { getSessions, openFolder, type Game, type Session } from "../lib/api";
+import { getSessions, openFolder, steamAchievements, type Achievements, type Game, type Session } from "../lib/api";
 import { clockTime, dayLabel, duration, hours, lastPlayed, size, SOURCE_LABEL } from "../lib/format";
 import { usePageActions } from "../nav/actions";
 import { focusEngine } from "../nav/focus";
@@ -12,7 +12,7 @@ interface Props {
   onFav: (g: Game) => void;
 }
 
-const TABS = ["Visão geral", "Sessões"];
+const BASE_TABS = ["Visão geral", "Sessões"];
 const DAYS = 14;
 
 /** Página de um jogo: números, ações e as sessões que o hub gravou. */
@@ -20,9 +20,18 @@ export function GamePage({ game, onPlay, onCover, fav, onFav }: Props) {
   const [tab, setTab] = useState(0);
   const [sessions, setSessions] = useState<Session[] | null>(null);
 
+  // Conquistas: só jogos da Steam (precisa da chave em Configurações).
+  const [ach, setAch] = useState<Achievements | null>(null);
+  const [achError, setAchError] = useState<string | null>(null);
+  const TABS = game.source === "steam" ? [...BASE_TABS, "Conquistas"] : BASE_TABS;
+
   useEffect(() => {
     setSessions(null);
+    setTab(0);
     getSessions(game.id).then(setSessions).catch(() => setSessions([]));
+    setAch(null);
+    setAchError(null);
+    if (game.source === "steam") steamAchievements(game).then(setAch).catch((e) => setAchError(String(e)));
   }, [game.id]);
 
   usePageActions((a) => {
@@ -44,7 +53,8 @@ export function GamePage({ game, onPlay, onCover, fav, onFav }: Props) {
           <Stat label="Tempo jogado" value={hours(game.playtimeMinutes)} />
           <Stat label="Última sessão" value={lastPlayed(game.lastPlayed)} />
           <Stat label="Sessões no hub" value={sessions ? String(sessions.length) : "…"} />
-          <Stat label="Tamanho" value={size(game.sizeOnDisk)} />
+          {ach && ach.total > 0 && <Stat label="Conquistas" value={`${ach.unlocked} / ${ach.total}`} />}
+          {game.installed && <Stat label="Tamanho" value={size(game.sizeOnDisk)} />}
         </div>
         <div className="btns">
           <button className="btn primary" data-nav data-nav-default onClick={() => onPlay(game)}>
@@ -99,8 +109,10 @@ export function GamePage({ game, onPlay, onCover, fav, onFav }: Props) {
             <dt>Tempo medido pelo hub</dt>
             <dd>{sessions ? (measured ? duration(measured) : "Ainda nada: começa a contar a partir de agora") : "…"}</dd>
           </dl>
-        ) : (
+        ) : tab === 1 ? (
           <SessionsTab sessions={sessions} />
+        ) : (
+          <AchievementsTab ach={ach} error={achError} />
         )}
       </div>
     </section>
@@ -113,6 +125,34 @@ function Stat({ label, value }: { label: string; value: string }) {
       <small>{label}</small>
       <b>{value}</b>
     </div>
+  );
+}
+
+function AchievementsTab({ ach, error }: { ach: Achievements | null; error: string | null }) {
+  if (error) return <p className="muted">{error}</p>;
+  if (!ach) return <p className="muted">Carregando…</p>;
+  if (!ach.total) return <p className="muted">Este jogo não tem conquistas na Steam.</p>;
+  const pct = Math.round((ach.unlocked / ach.total) * 100);
+  return (
+    <>
+      <h3 className="eyebrow">
+        {ach.unlocked} de {ach.total} · {pct}%
+      </h3>
+      <div className="meter" role="img" aria-label={`${pct}% das conquistas`}>
+        <i style={{ transform: `scaleX(${ach.unlocked / ach.total})` }} />
+      </div>
+      <div className="rows">
+        {ach.items.map((a) => (
+          <div key={a.name + a.unlockTime} className={`rowline ach${a.achieved ? "" : " locked"}`} data-nav tabIndex={-1}>
+            <span>
+              <b>{a.name}</b>
+              {a.description && <small className="muted"> · {a.description}</small>}
+            </span>
+            <span className="muted tnum">{a.achieved ? (a.unlockTime ? new Date(a.unlockTime * 1000).toLocaleDateString("pt-BR") : "Conquistada") : "Falta"}</span>
+          </div>
+        ))}
+      </div>
+    </>
   );
 }
 

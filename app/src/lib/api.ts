@@ -183,16 +183,18 @@ export async function getAllSessions(): Promise<Session[]> {
 
 export interface Settings {
   hasSgdbKey: boolean;
+  hasSteamKey: boolean;
   theme: "auto" | "light" | "dark";
   accent: string | null;
   autostart: boolean;
   steamRoot: string | null;
 }
 
-let mockSettings: Settings = { hasSgdbKey: false, theme: "auto", accent: null, autostart: true, steamRoot: null };
+let mockSettings: Settings = { hasSgdbKey: false, hasSteamKey: false, theme: "auto", accent: null, autostart: true, steamRoot: null };
 export const getSettings = () => (inTauri ? invoke<Settings>("get_settings") : Promise.resolve(mockSettings));
-export async function setSetting(key: "theme" | "accent" | "autostart", value: string): Promise<void> {
+export async function setSetting(key: "theme" | "accent" | "autostart" | "steamKey", value: string): Promise<void> {
   if (inTauri) return invoke<void>("set_setting", { key, value });
+  if (key === "steamKey") return void (mockSettings = { ...mockSettings, hasSteamKey: !!value });
   mockSettings = { ...mockSettings, [key]: key === "autostart" ? value === "true" : value || null } as Settings;
 }
 
@@ -243,4 +245,27 @@ export const mediaArt = () => (inTauri ? invoke<string | null>("media_art") : Pr
 export async function mediaControl(action: "toggle" | "next" | "prev"): Promise<void> {
   if (inTauri) return invoke<void>("media_control", { action });
   if (mockMedia && action === "toggle") mockMedia = { ...mockMedia, playing: !mockMedia.playing };
+}
+
+/** Busca na Steam a lista completa de jogos da conta. Devolve quantos são. */
+export const refreshSteam = () => (inTauri ? invoke<number>("refresh_steam") : Promise.resolve(MOCK_GAMES.length));
+
+export interface Achievement {
+  name: string;
+  description: string;
+  achieved: boolean;
+  unlockTime: number;
+}
+export interface Achievements {
+  total: number;
+  unlocked: number;
+  items: Achievement[];
+}
+
+export async function steamAchievements(g: Game): Promise<Achievements> {
+  const appid = Number(g.id.split(":")[1]);
+  if (inTauri) return invoke<Achievements>("steam_achievements", { appid });
+  const now = Math.floor(Date.now() / 1000);
+  const items = Array.from({ length: 12 }, (_, i) => ({ name: `Conquista ${i + 1}`, description: "Descrição de exemplo da conquista.", achieved: i < 5, unlockTime: i < 5 ? now - i * 86400 * 3 : 0 }));
+  return { total: 12, unlocked: 5, items };
 }

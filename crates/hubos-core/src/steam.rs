@@ -161,6 +161,11 @@ pub fn read_playtime(steam_root: &Path) -> HashMap<u32, PlayStats> {
 
 /// ID da conta (pasta em `userdata`) do último login. Se não der para saber,
 /// usa a pasta de `userdata` modificada mais recentemente.
+/// SteamID64 da conta em uso (o número longo que a API da Steam pede).
+pub fn steam_id64(steam_root: &Path) -> Option<u64> {
+    current_account(steam_root).map(|id| id + STEAMID64_BASE)
+}
+
 pub fn current_account(steam_root: &Path) -> Option<u64> {
     if let Some(doc) = read_vdf(&steam_root.join("config").join("loginusers.vdf")) {
         if let Some(users) = doc.get("users") {
