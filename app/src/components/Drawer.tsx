@@ -15,6 +15,7 @@ export const MENU: MenuItem[] = [
   { id: "home", label: "Início", icon: I('<path d="M4 11l8-7 8 7v9h-5v-6H9v6H4z"/>') },
   { id: "games", label: "Jogos", icon: I('<rect x="2.5" y="7" width="19" height="11" rx="5.5"/><path d="M7 10.5v4M5 12.5h4M15.5 11.5h.01M17.5 13.5h.01"/>') },
   { id: "apps", label: "Apps", icon: I('<rect x="4" y="4" width="7" height="7" rx="1"/><rect x="13" y="4" width="7" height="7" rx="1"/><rect x="4" y="13" width="7" height="7" rx="1"/><rect x="13" y="13" width="7" height="7" rx="1"/>') },
+  { id: "browser", label: "Navegador", icon: I('<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3.5 3 14.5 0 18M12 3c-3 3.5-3 14.5 0 18"/>') },
   { id: "store", label: "Loja", icon: I('<path d="M5 8h14l-1 12H6zM9 8a3 3 0 0 1 6 0"/>'), soon: true },
   { id: "downloads", label: "Downloads", icon: I('<path d="M12 4v11M7 10l5 5 5-5M5 20h14"/>') },
   { id: "party", label: "Party", icon: I('<path d="M4 5h16v11H9l-5 4z"/>') },

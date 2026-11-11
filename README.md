@@ -42,7 +42,11 @@ npm run tauri dev
 - **Favoritos** (Y no controle, F no teclado) e **Perfil** (resumo, favoritos, recordes, atividade).
 - **Diagnóstico** em Configurações: o que o hub achou no PC e o diário (`hubos.log`), com botão de copiar.
 
-Ainda não: Party do Discord dentro do hub, fila/playlists do Spotify, AudioHub, Loja, Notificações e RetroAchievements (desenhados no protótipo).
+- **Conta Steam** (chave grátis em Configurações): jogos não instalados e conquistas.
+- **Party**: entrar, sair, mutar e ver quem está nas chamadas do Discord, sem sair do hub (Client ID e Secret de um aplicativo seu, em Configurações).
+- **Navegador do hub**: sites (YouTube, Twitch, Kick, Claude) abrem numa tela do próprio hub.
+
+Ainda não: fila/playlists do Spotify, AudioHub, Loja, HowLongToBeat, Notificações e RetroAchievements.
 
 ## Outros arquivos
 

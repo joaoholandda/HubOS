@@ -364,3 +364,8 @@ button.rowline { width: 100%; text-align: left; font: inherit; color: inherit; a
 .p-join { font-size: 13px; color: var(--ink-2); }
 .opt[disabled] { opacity: 0.6; }
 .srow .ctl { flex-wrap: wrap; }
+
+/* ---------- navegador ---------- */
+.browser-slot { height: 100%; min-height: 300px; display: grid; place-items: center; border-radius: var(--r-md); background: var(--surface); }
+.addr { flex: 1; min-width: 120px; display: flex; }
+.addr .field { flex: 1; height: 44px; border-radius: var(--r-pill); padding: 0 18px; }

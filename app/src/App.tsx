@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { addExeGame, applyAppearance, closeGame, getFavorites, getGameState, getLibrary, getSettings, hideHub, refreshSteam, inTauri, launchGame, onGameState, openApp, openFiles, openUrl, toggleFavorite, type Game, type Library, type RunningGame } from "./lib/api";
+import { addExeGame, applyAppearance, closeGame, getFavorites, getGameState, getLibrary, getSettings, hideHub, refreshSteam, inTauri, launchGame, onGameState, openFiles, openUrl, toggleFavorite, type Game, type Library, type RunningGame } from "./lib/api";
 import { totalHours } from "./lib/format";
 import { focusEngine } from "./nav/focus";
 import { useInput, type Action } from "./nav/input";
@@ -19,9 +19,10 @@ import { TopBar } from "./components/TopBar";
 import { MediaSheet, useMedia } from "./components/MediaSheet";
 import { ProfilePage } from "./components/ProfilePage";
 import { PartySheet } from "./components/PartySheet";
+import { BrowserBar, BrowserPage } from "./components/BrowserPage";
 import { useToast } from "./components/Toast";
 
-type Route = { page: "home" } | { page: "games" } | { page: "apps" } | { page: "stats" } | { page: "settings" } | { page: "profile" } | { page: "game"; id: string };
+type Route = { page: "home" } | { page: "games" } | { page: "apps" } | { page: "stats" } | { page: "settings" } | { page: "profile" } | { page: "browser"; url: string } | { page: "game"; id: string };
 
 export default function App() {
   const [route, setRoute] = useState<Route>({ page: "home" });
@@ -217,7 +218,8 @@ export default function App() {
       if (m.id === "desktop") return void hideHub();
       const fail = (e: unknown) => toast(String(e));
       if (m.id === "spotify") return setMediaOpen(true);
-      if (m.id === "claude") return void openApp("claude").catch(fail);
+      if (m.id === "claude") return go({ page: "browser", url: "https://claude.ai" }, false);
+      if (m.id === "browser") return go({ page: "browser", url: "https://www.google.com" }, false);
       if (m.id === "files") return void openFiles().catch(fail);
       if (m.id === "downloads") return void openUrl("steam://open/downloads").catch(fail);
       if (m.id === "party") return setPartyOpen(true);
@@ -282,7 +284,7 @@ export default function App() {
   return (
     <div className="app">
       {(route.page === "home" || route.page === "game") && <Backdrop game={route.page === "game" ? (pageGame ?? focused) : focused} />}
-      <TopBar onMenu={() => setDrawer(true)} onBack={route.page === "home" ? undefined : goBack} totalLabel={totalHours(games)} padConnected={pad} onProfile={() => routeRef.current.page !== "profile" && go({ page: "profile" })} media={mediaState.media} art={mediaState.art} onMedia={() => setMediaOpen(true)} />
+      <TopBar onMenu={() => setDrawer(true)} onBack={route.page === "home" ? undefined : goBack} totalLabel={totalHours(games)} padConnected={pad} onProfile={() => routeRef.current.page !== "profile" && go({ page: "profile" })} media={mediaState.media} art={mediaState.art} onMedia={() => setMediaOpen(true)} extra={route.page === "browser" ? <BrowserBar url={route.url} onGo={(url) => go({ page: "browser", url }, false)} /> : undefined} />
       <main className="main" ref={mainRef} data-nav-scroll>
         {error ? (
           <section className="home empty">
@@ -294,7 +296,9 @@ export default function App() {
         ) : route.page === "games" ? (
           <GamesPage games={games} favorites={favorites} onOpen={details} onAdd={addGame} />
         ) : route.page === "apps" ? (
-          <AppsPage toast={toast} />
+          <AppsPage toast={toast} onSite={(url) => go({ page: "browser", url })} />
+        ) : route.page === "browser" ? (
+          <BrowserPage url={route.url} covered={drawer || powerOpen || mediaOpen || partyOpen || !!coverFor} toast={toast} />
         ) : route.page === "stats" ? (
           <StatsPage games={games} onOpen={details} />
         ) : route.page === "settings" ? (

@@ -4,7 +4,7 @@ import { usePageActions } from "../nav/actions";
 import { focusEngine } from "../nav/focus";
 
 /** Apps e sites de acesso rápido. X no controle remove o item focado. */
-export function AppsPage({ toast }: { toast: (m: string) => void }) {
+export function AppsPage({ toast, onSite }: { toast: (m: string) => void; onSite: (url: string) => void }) {
   const [apps, setApps] = useState<AppEntry[]>([]);
   const [name, setName] = useState("");
   const [target, setTarget] = useState("");
@@ -14,7 +14,9 @@ export function AppsPage({ toast }: { toast: (m: string) => void }) {
     getApps().then(setApps);
   }, []);
 
-  const open = (a: AppEntry) => openApp(a.id).then(() => toast(`Abrindo ${a.name}…`)).catch((e) => toast(String(e)));
+  // Sites abrem no navegador do hub; programas abrem no Windows.
+  const open = (a: AppEntry) => (a.kind === "site" ? onSite(a.target) : openProgram(a));
+  const openProgram = (a: AppEntry) => openApp(a.id).then(() => toast(`Abrindo ${a.name}…`)).catch((e) => toast(String(e)));
   const remove = async (id: string) => {
     if (armed !== id) {
       setArmed(id);
@@ -53,7 +55,7 @@ export function AppsPage({ toast }: { toast: (m: string) => void }) {
             <span className="mono">{a.name.slice(0, 1).toUpperCase()}</span>
             <span>
               <b>{a.name}</b>
-              <small>{armed === a.id ? "Aperte de novo para remover" : kind === "site" ? "abre no navegador" : "programa"}</small>
+              <small>{armed === a.id ? "Aperte de novo para remover" : kind === "site" ? "abre aqui no hub" : "programa"}</small>
             </span>
           </button>
         ))}

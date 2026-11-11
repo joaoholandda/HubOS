@@ -24,4 +24,4 @@ cd app && npx tsc --noEmit -p . && npm run build
 O app não roda no Linux (só a interface, com `npm run dev`). O instalador sai do GitHub Actions (artifact `HubOS-windows`) a cada envio para a `main`.
 
 ## Estado
-Nada foi testado em Windows real ainda. Pontos de maior risco: jogos do Xbox (PowerShell), fechar jogo da Steam pela pasta, botão Guide, leitura de mídia do Windows. Pendente: Party do Discord, API do Spotify, AudioHub (API local), Loja, Notificações, RetroAchievements.
+O dono já testou a primeira alfa no Windows (base funciona). Ainda sem teste real: conta Steam (chave), Party do Discord (RPC local), navegador do hub (janela filha), mídia do Windows. Uso principal é teclado e mouse; controle é secundário. Nunca colocar chaves no repositório: elas ficam em `settings.json` na pasta de dados. Pendente: HowLongToBeat, API do Spotify, AudioHub (adiado), Loja, Notificações, RetroAchievements.

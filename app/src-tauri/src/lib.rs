@@ -1,6 +1,7 @@
 //! Lado "sistema" do HubOS: acha as bibliotecas de jogos e abre os jogos.
 //! A interface (React) chama os comandos abaixo com `invoke`.
 
+mod browser;
 mod console;
 mod covers;
 mod custom;
@@ -402,6 +403,37 @@ async fn discord_set_voice(app: tauri::AppHandle, what: String, on: bool) -> Res
     discord_job(app, move |a| discord::set_voice(a, &what, on)).await
 }
 
+/// Abre um endereço no navegador do hub, encaixado na área de conteúdo.
+#[tauri::command]
+async fn browser_open(app: tauri::AppHandle, url: String, rect: browser::Rect) -> Result<(), String> {
+    browser::open(&app, &url, rect)
+}
+
+#[tauri::command]
+fn browser_bounds(app: tauri::AppHandle, rect: browser::Rect) -> Result<(), String> {
+    browser::set_bounds(&app, rect)
+}
+
+#[tauri::command]
+fn browser_show(app: tauri::AppHandle, on: bool) {
+    browser::show(&app, on);
+}
+
+#[tauri::command]
+fn browser_action(app: tauri::AppHandle, what: String) -> Result<(), String> {
+    browser::action(&app, &what)
+}
+
+#[tauri::command]
+fn browser_url(app: tauri::AppHandle) -> Option<String> {
+    browser::current_url(&app)
+}
+
+#[tauri::command]
+fn browser_close(app: tauri::AppHandle) {
+    browser::close(&app);
+}
+
 /// Jogo rodando agora, para a interface saber ao (re)abrir.
 #[tauri::command]
 fn get_game_state(state: tauri::State<console::ConsoleState>) -> console::GameState {
@@ -527,7 +559,7 @@ pub fn run() {
         .manage(xbox::XboxState::default())
         .manage(ScanState::default())
         .manage(discord::DiscordState::default())
-        .invoke_handler(tauri::generate_handler![get_library, launch_game, open_external, close_game, power, add_exe_game, remove_game, rename_game, get_apps, add_app, remove_app, open_app, get_all_sessions, get_settings, set_setting, get_game_state, hide_hub, get_sessions, has_sgdb_key, set_sgdb_key, cover_options, set_cover, reset_cover, get_diagnostics, open_data_dir, open_files, get_favorites, toggle_favorite, get_media, media_art, media_control, refresh_steam, steam_achievements, discord_status, discord_connect, discord_forget, discord_open, discord_party, discord_guilds, discord_channels, discord_join, discord_set_voice])
+        .invoke_handler(tauri::generate_handler![get_library, launch_game, open_external, close_game, power, add_exe_game, remove_game, rename_game, get_apps, add_app, remove_app, open_app, get_all_sessions, get_settings, set_setting, get_game_state, hide_hub, get_sessions, has_sgdb_key, set_sgdb_key, cover_options, set_cover, reset_cover, get_diagnostics, open_data_dir, open_files, get_favorites, toggle_favorite, get_media, media_art, media_control, refresh_steam, steam_achievements, discord_status, discord_connect, discord_forget, discord_open, discord_party, discord_guilds, discord_channels, discord_join, discord_set_voice, browser_open, browser_bounds, browser_show, browser_action, browser_url, browser_close])
         .setup(move |app| {
             // Em desenvolvimento, abre em janela para não prender a tela.
             #[cfg(debug_assertions)]

@@ -330,3 +330,17 @@ export async function discordSetVoice(what: "mute" | "deaf", on: boolean): Promi
   if (inTauri) return invoke<void>("discord_set_voice", { what, on });
   mockParty = { ...mockParty, [what]: on };
 }
+
+// ---------- Navegador do hub ----------
+export interface Rect {
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+}
+export const browserOpen = (url: string, rect: Rect) => (inTauri ? invoke<void>("browser_open", { url, rect }) : Promise.resolve());
+export const browserBounds = (rect: Rect) => (inTauri ? invoke<void>("browser_bounds", { rect }) : Promise.resolve());
+export const browserShow = (on: boolean) => (inTauri ? invoke<void>("browser_show", { on }) : Promise.resolve());
+export const browserAction = (what: "back" | "forward" | "reload") => (inTauri ? invoke<void>("browser_action", { what }) : Promise.resolve());
+export const browserUrl = () => (inTauri ? invoke<string | null>("browser_url") : Promise.resolve(null));
+export const browserClose = () => (inTauri ? invoke<void>("browser_close") : Promise.resolve());

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import type { Media } from "../lib/api";
 
 interface Props {
@@ -11,9 +11,11 @@ interface Props {
   media: Media | null;
   art: string | null;
   onMedia: () => void;
+  /** Controles extras da tela atual (ex.: navegador). Quando existem, o perfil sai para dar espaço. */
+  extra?: ReactNode;
 }
 
-export function TopBar({ onMenu, onBack, totalLabel, padConnected, onProfile, media, art, onMedia }: Props) {
+export function TopBar({ onMenu, onBack, totalLabel, padConnected, onProfile, media, art, onMedia, extra }: Props) {
   return (
     <header className="top" id="top">
       <button className="chip round" data-nav onClick={onMenu} aria-label="Abrir menu">
@@ -29,6 +31,8 @@ export function TopBar({ onMenu, onBack, totalLabel, padConnected, onProfile, me
           Voltar
         </button>
       )}
+      {extra}
+      {!extra && (
       <button className="chip profile" data-nav onClick={onProfile} aria-label="Abrir perfil">
         <span className="avatar">JH</span>
         <span className="who">
@@ -36,7 +40,8 @@ export function TopBar({ onMenu, onBack, totalLabel, padConnected, onProfile, me
           <small>{totalLabel}</small>
         </span>
       </button>
-      <div className="spacer" />
+      )}
+      {!extra && <div className="spacer" />}
       {media && (
         <button className="chip media" data-nav onClick={onMedia} aria-label={`Tocando agora: ${media.title}`}>
           <span className="media-thumb">{art ? <img src={art} alt="" /> : "♪"}</span>
