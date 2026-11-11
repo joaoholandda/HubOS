@@ -24,7 +24,7 @@ sysinfo = "0.32"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 base64 = "0.22"
-reqwest = { version = "0.12", default-features = false, features = ["json", "default-tls"] }
+reqwest = { version = "0.12", default-features = false, features = ["json", "default-tls", "blocking"] }
 
 [target.'cfg(windows)'.dependencies]
 winreg = "0.55"

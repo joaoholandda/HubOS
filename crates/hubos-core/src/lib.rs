@@ -3,6 +3,7 @@
 //! Fica separado do app Tauri para poder ser testado em qualquer máquina
 //! (inclusive no CI em Linux) com arquivos de exemplo.
 
+pub mod discord;
 pub mod media;
 pub mod model;
 pub mod sessions;

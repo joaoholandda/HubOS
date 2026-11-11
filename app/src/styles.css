@@ -352,3 +352,15 @@ button.rowline { width: 100%; text-align: left; font: inherit; color: inherit; a
 .meter i { display: block; height: 100%; background: var(--accent); transform-origin: left; }
 .ach.locked b { font-weight: 500; color: var(--ink-2); }
 .ach > span:last-child { flex: none; }
+
+/* ---------- party ---------- */
+.p-avatar { flex: none; display: inline-grid; place-items: center; width: 32px; height: 32px; margin-right: 12px; border-radius: var(--r-pill); overflow: hidden; background: var(--ink); color: var(--bg); font: 600 13px var(--display); vertical-align: middle; }
+.p-avatar.sq { border-radius: var(--r-sm); margin-right: 0; }
+.p-avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.p-member { background: var(--surface-2); align-items: center; }
+.p-channel { min-height: 64px; text-align: left; }
+.p-channel > span:first-child { display: grid; gap: 2px; min-width: 0; flex: 1; }
+.p-channel small { margin: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.p-join { font-size: 13px; color: var(--ink-2); }
+.opt[disabled] { opacity: 0.6; }
+.srow .ctl { flex-wrap: wrap; }

@@ -18,6 +18,7 @@ import { StatsPage } from "./components/StatsPage";
 import { TopBar } from "./components/TopBar";
 import { MediaSheet, useMedia } from "./components/MediaSheet";
 import { ProfilePage } from "./components/ProfilePage";
+import { PartySheet } from "./components/PartySheet";
 import { useToast } from "./components/Toast";
 
 type Route = { page: "home" } | { page: "games" } | { page: "apps" } | { page: "stats" } | { page: "settings" } | { page: "profile" } | { page: "game"; id: string };
@@ -37,6 +38,9 @@ export default function App() {
   const [powerOpen, setPowerOpen] = useState(false);
   const [quitArmed, setQuitArmed] = useState(false);
   const [mediaOpen, setMediaOpen] = useState(false);
+  const [partyOpen, setPartyOpen] = useState(false);
+  const partyRef = useRef(false);
+  partyRef.current = partyOpen;
   const [favorites, setFavorites] = useState<string[]>([]);
   const coverOpen = useRef(false);
   coverOpen.current = !!coverFor;
@@ -152,6 +156,10 @@ export default function App() {
       if (a === "back") setPowerOpen(false);
       return;
     }
+    if (partyRef.current) {
+      if (a === "back") setPartyOpen(false);
+      return;
+    }
     if (mediaRef.current) {
       if (a === "back") setMediaOpen(false);
       return;
@@ -212,10 +220,7 @@ export default function App() {
       if (m.id === "claude") return void openApp("claude").catch(fail);
       if (m.id === "files") return void openFiles().catch(fail);
       if (m.id === "downloads") return void openUrl("steam://open/downloads").catch(fail);
-      if (m.id === "party") {
-        toast("Abrindo o Discord. A Party dentro do hub chega depois.");
-        return void openApp("discord").catch(fail);
-      }
+      if (m.id === "party") return setPartyOpen(true);
       if (m.soon) toast(`${m.label}: chega nas próximas etapas`);
     },
     [toast, go],
@@ -306,6 +311,16 @@ export default function App() {
       {coverFor && <CoverPicker game={coverFor} onClose={() => setCoverFor(null)} onChanged={changeCover} toast={toast} />}
       {powerOpen && <PowerSheet gameOpen={runningGame?.title ?? (running ? "Um jogo" : null)} onClose={() => setPowerOpen(false)} onDesktop={() => void hideHub()} toast={toast} />}
       {mediaOpen && <MediaSheet state={mediaState} onClose={() => setMediaOpen(false)} toast={toast} />}
+      {partyOpen && (
+        <PartySheet
+          onClose={() => setPartyOpen(false)}
+          onSettings={() => {
+            setPartyOpen(false);
+            go({ page: "settings" }, false);
+          }}
+          toast={toast}
+        />
+      )}
       {toastNode}
     </div>
   );

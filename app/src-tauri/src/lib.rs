@@ -4,6 +4,7 @@
 mod console;
 mod covers;
 mod custom;
+mod discord;
 mod log;
 mod media;
 mod steamweb;
@@ -252,6 +253,8 @@ fn set_setting(app: tauri::AppHandle, key: String, value: String) -> Result<(), 
     match key.as_str() {
         "theme" => s.theme = Some(value),
         "accent" => s.accent = (!value.is_empty()).then_some(value),
+        "discordId" => s.discord_id = Some(value.trim().to_string()).filter(|v| !v.is_empty()),
+        "discordSecret" => s.discord_secret = Some(value.trim().to_string()).filter(|v| !v.is_empty()),
         "steamKey" => s.steam_key = Some(value.trim().to_string()).filter(|v| !v.is_empty()),
         "autostart" => {
             let r = if value == "true" { app.autolaunch().enable() } else { app.autolaunch().disable() };
@@ -344,6 +347,59 @@ async fn refresh_steam(app: tauri::AppHandle) -> Result<usize, String> {
 #[tauri::command]
 async fn steam_achievements(app: tauri::AppHandle, appid: u32) -> Result<hubos_core::steamweb::Achievements, String> {
     steamweb::achievements(&app, find_steam_root().as_deref(), appid).await
+}
+
+/// Roda uma ação do Discord fora da thread da interface (pode esperar a janela de autorização).
+async fn discord_job<T: Send + 'static>(app: tauri::AppHandle, f: impl FnOnce(&tauri::AppHandle) -> Result<T, String> + Send + 'static) -> Result<T, String> {
+    tauri::async_runtime::spawn_blocking(move || f(&app)).await.map_err(|e| e.to_string())?
+}
+
+#[tauri::command]
+fn discord_status(app: tauri::AppHandle) -> discord::Status {
+    discord::status(&app)
+}
+
+/// Conecta ao Discord aberto no PC. Devolve o nome da conta.
+#[tauri::command]
+async fn discord_connect(app: tauri::AppHandle) -> Result<String, String> {
+    discord_job(app, discord::connect_now).await
+}
+
+#[tauri::command]
+fn discord_forget(app: tauri::AppHandle) {
+    discord::forget(&app);
+}
+
+/// Abre o Discord minimizado, sem tirar o hub da frente.
+#[tauri::command]
+fn discord_open() -> Result<(), String> {
+    system::start_discord_hidden()
+}
+
+#[tauri::command]
+async fn discord_party(app: tauri::AppHandle) -> Result<discord::Party, String> {
+    discord_job(app, discord::party).await
+}
+
+#[tauri::command]
+async fn discord_guilds(app: tauri::AppHandle) -> Result<Vec<hubos_core::discord::Guild>, String> {
+    discord_job(app, discord::guilds).await
+}
+
+#[tauri::command]
+async fn discord_channels(app: tauri::AppHandle, guild_id: String) -> Result<Vec<hubos_core::discord::VoiceChannel>, String> {
+    discord_job(app, move |a| discord::channels(a, &guild_id)).await
+}
+
+/// Entra em um canal de voz (ou sai, sem `channel_id`).
+#[tauri::command]
+async fn discord_join(app: tauri::AppHandle, channel_id: Option<String>) -> Result<(), String> {
+    discord_job(app, move |a| discord::join(a, channel_id.as_deref())).await
+}
+
+#[tauri::command]
+async fn discord_set_voice(app: tauri::AppHandle, what: String, on: bool) -> Result<(), String> {
+    discord_job(app, move |a| discord::set_voice(a, &what, on)).await
 }
 
 /// Jogo rodando agora, para a interface saber ao (re)abrir.
@@ -470,7 +526,8 @@ pub fn run() {
         .manage(console::ConsoleState::default())
         .manage(xbox::XboxState::default())
         .manage(ScanState::default())
-        .invoke_handler(tauri::generate_handler![get_library, launch_game, open_external, close_game, power, add_exe_game, remove_game, rename_game, get_apps, add_app, remove_app, open_app, get_all_sessions, get_settings, set_setting, get_game_state, hide_hub, get_sessions, has_sgdb_key, set_sgdb_key, cover_options, set_cover, reset_cover, get_diagnostics, open_data_dir, open_files, get_favorites, toggle_favorite, get_media, media_art, media_control, refresh_steam, steam_achievements])
+        .manage(discord::DiscordState::default())
+        .invoke_handler(tauri::generate_handler![get_library, launch_game, open_external, close_game, power, add_exe_game, remove_game, rename_game, get_apps, add_app, remove_app, open_app, get_all_sessions, get_settings, set_setting, get_game_state, hide_hub, get_sessions, has_sgdb_key, set_sgdb_key, cover_options, set_cover, reset_cover, get_diagnostics, open_data_dir, open_files, get_favorites, toggle_favorite, get_media, media_art, media_control, refresh_steam, steam_achievements, discord_status, discord_connect, discord_forget, discord_open, discord_party, discord_guilds, discord_channels, discord_join, discord_set_voice])
         .setup(move |app| {
             // Em desenvolvimento, abre em janela para não prender a tela.
             #[cfg(debug_assertions)]

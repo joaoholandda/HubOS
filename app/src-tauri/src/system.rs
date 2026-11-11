@@ -50,6 +50,16 @@ pub fn start(target: &str) -> Result<(), String> {
     c.spawn().map(|_| ()).map_err(|e| format!("Não consegui abrir {target}: {e}"))
 }
 
+/// Abre o Discord sem trazer a janela dele para a frente (fica na bandeja).
+pub fn start_discord_hidden() -> Result<(), String> {
+    let local = std::env::var("LOCALAPPDATA").map_err(|_| "Não achei a pasta do Discord.".to_string())?;
+    let updater = std::path::Path::new(&local).join("Discord").join("Update.exe");
+    if !updater.is_file() {
+        return Err("O Discord não está instalado neste PC.".into());
+    }
+    quiet(&updater.to_string_lossy()).args(["--processStart", "Discord.exe", "--process-start-args", "--start-minimized"]).spawn().map(|_| ()).map_err(|e| format!("Não consegui abrir o Discord: {e}"))
+}
+
 /// Fecha um processo e os filhos dele.
 pub fn kill_pid(pid: u32) -> Result<(), String> {
     quiet("taskkill").args(["/PID", &pid.to_string(), "/T", "/F"]).spawn().map(|_| ()).map_err(|e| e.to_string())

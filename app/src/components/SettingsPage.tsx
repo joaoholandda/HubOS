@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Diagnostics } from "./Diagnostics";
-import { applyAppearance, getSettings, refreshSteam, setSetting, setSgdbKey, type Settings } from "../lib/api";
+import { applyAppearance, discordForget, discordStatus, type DiscordStatus, getSettings, refreshSteam, setSetting, setSgdbKey, type Settings } from "../lib/api";
 
 const THEMES: { id: Settings["theme"]; label: string }[] = [
   { id: "light", label: "Claro" },
@@ -23,6 +23,12 @@ export function SettingsPage({ toast, onRescan }: { toast: (m: string) => void; 
   const [key, setKey] = useState("");
   const [steamKey, setSteamKey] = useState("");
   const [busy, setBusy] = useState(false);
+  const [dId, setDId] = useState("");
+  const [dSecret, setDSecret] = useState("");
+  const [discord, setDiscord] = useState<DiscordStatus | null>(null);
+  useEffect(() => {
+    discordStatus().then(setDiscord);
+  }, []);
   useEffect(() => {
     getSettings().then(setS);
   }, []);
@@ -152,6 +158,40 @@ export function SettingsPage({ toast, onRescan }: { toast: (m: string) => void; 
               }}
             >
               {busy ? "Buscando…" : steamKey.trim() ? "Salvar" : "Atualizar"}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div className="group">
+        <h3 className="eyebrow">Discord (Party)</h3>
+        <div className="srow">
+          <div className="lb">
+            <b>Aplicativo do Discord</b>
+            <small>{discord?.configured ? "Chaves salvas. Abra Party no menu para conectar. Cole outras para trocar." : "discord.com/developers/applications › New Application › OAuth2. Adicione o redirect http://localhost e cole aqui o Client ID e o Client Secret."}</small>
+          </div>
+          <div className="ctl">
+            <input className="field" data-nav value={dId} onChange={(e) => setDId(e.target.value)} placeholder="Client ID" spellCheck={false} />
+            <input className="field" data-nav type="password" value={dSecret} onChange={(e) => setDSecret(e.target.value)} placeholder="Client Secret" spellCheck={false} />
+            <button
+              className="btn"
+              data-nav
+              disabled={!dId.trim() || !dSecret.trim()}
+              onClick={async () => {
+                try {
+                  await setSetting("discordId", dId);
+                  await setSetting("discordSecret", dSecret);
+                  await discordForget();
+                  setDId("");
+                  setDSecret("");
+                  setDiscord(await discordStatus());
+                  toast("Discord configurado. Abra Party no menu.");
+                } catch (e) {
+                  toast(String(e));
+                }
+              }}
+            >
+              Salvar
             </button>
           </div>
         </div>

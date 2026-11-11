@@ -192,8 +192,9 @@ export interface Settings {
 
 let mockSettings: Settings = { hasSgdbKey: false, hasSteamKey: false, theme: "auto", accent: null, autostart: true, steamRoot: null };
 export const getSettings = () => (inTauri ? invoke<Settings>("get_settings") : Promise.resolve(mockSettings));
-export async function setSetting(key: "theme" | "accent" | "autostart" | "steamKey", value: string): Promise<void> {
+export async function setSetting(key: "theme" | "accent" | "autostart" | "steamKey" | "discordId" | "discordSecret", value: string): Promise<void> {
   if (inTauri) return invoke<void>("set_setting", { key, value });
+  if (key === "discordId" || key === "discordSecret") return;
   if (key === "steamKey") return void (mockSettings = { ...mockSettings, hasSteamKey: !!value });
   mockSettings = { ...mockSettings, [key]: key === "autostart" ? value === "true" : value || null } as Settings;
 }
@@ -268,4 +269,64 @@ export async function steamAchievements(g: Game): Promise<Achievements> {
   const now = Math.floor(Date.now() / 1000);
   const items = Array.from({ length: 12 }, (_, i) => ({ name: `Conquista ${i + 1}`, description: "Descrição de exemplo da conquista.", achieved: i < 5, unlockTime: i < 5 ? now - i * 86400 * 3 : 0 }));
   return { total: 12, unlocked: 5, items };
+}
+
+// ---------- Party (Discord) ----------
+export interface DiscordStatus {
+  configured: boolean;
+  connected: boolean;
+  user: string | null;
+}
+export interface Member {
+  id: string;
+  name: string;
+  avatarUrl: string | null;
+  muted: boolean;
+  deafened: boolean;
+}
+export interface VoiceChannel {
+  id: string;
+  name: string;
+  guildId: string | null;
+  members: Member[];
+}
+export interface Guild {
+  id: string;
+  name: string;
+  iconUrl: string | null;
+}
+export interface Party {
+  channel: VoiceChannel | null;
+  mute: boolean;
+  deaf: boolean;
+}
+
+// Dados de exemplo para desenhar a Party no navegador.
+const m = (id: string, name: string, muted = false): Member => ({ id, name, avatarUrl: null, muted, deafened: false });
+const MOCK_CHANNELS: VoiceChannel[] = [
+  { id: "c1", name: "Geral", guildId: "g1", members: [m("2", "Ana"), m("3", "Pedro", true)] },
+  { id: "c2", name: "Jogando", guildId: "g1", members: [] },
+];
+let mockParty: Party = { channel: null, mute: false, deaf: false };
+let mockConnected = false;
+
+export const discordStatus = () => (inTauri ? invoke<DiscordStatus>("discord_status") : Promise.resolve({ configured: true, connected: mockConnected, user: mockConnected ? "João" : null }));
+export async function discordConnect(): Promise<string> {
+  if (inTauri) return invoke<string>("discord_connect");
+  mockConnected = true;
+  return "João";
+}
+export const discordOpen = () => (inTauri ? invoke<void>("discord_open") : Promise.resolve());
+export const discordForget = () => (inTauri ? invoke<void>("discord_forget") : Promise.resolve());
+export const discordParty = () => (inTauri ? invoke<Party>("discord_party") : Promise.resolve(mockParty));
+export const discordGuilds = () => (inTauri ? invoke<Guild[]>("discord_guilds") : Promise.resolve([{ id: "g1", name: "Amigos", iconUrl: null }, { id: "g2", name: "Servidor de exemplo", iconUrl: null }]));
+export const discordChannels = (guildId: string) => (inTauri ? invoke<VoiceChannel[]>("discord_channels", { guildId }) : Promise.resolve(MOCK_CHANNELS));
+export async function discordJoin(channelId: string | null): Promise<void> {
+  if (inTauri) return invoke<void>("discord_join", { channelId });
+  const ch = MOCK_CHANNELS.find((c) => c.id === channelId);
+  mockParty = { ...mockParty, channel: ch ? { ...ch, members: [m("1", "João", mockParty.mute), ...ch.members] } : null };
+}
+export async function discordSetVoice(what: "mute" | "deaf", on: boolean): Promise<void> {
+  if (inTauri) return invoke<void>("discord_set_voice", { what, on });
+  mockParty = { ...mockParty, [what]: on };
 }
