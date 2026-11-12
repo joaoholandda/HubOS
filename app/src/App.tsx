@@ -306,7 +306,7 @@ export default function App() {
         ) : route.page === "profile" ? (
           <ProfilePage games={games} favorites={favorites} running={running} onOpen={details} />
         ) : route.page === "game" && pageGame ? (
-          <GamePage game={pageGame} onPlay={play} onCover={setCoverFor} fav={favorites.includes(pageGame.id)} onFav={toggleFav} />
+          <GamePage game={pageGame} onPlay={play} onCover={setCoverFor} fav={favorites.includes(pageGame.id)} onFav={toggleFav} onSite={(url) => go({ page: "browser", url })} />
         ) : (
           <Home games={homeGames} onPlay={play} onDetails={details} onCover={setCoverFor} onFocusGame={setFocused} banner={banner} favorites={favorites} />
         )}

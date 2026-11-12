@@ -10,13 +10,15 @@ interface Props {
   onCover: (g: Game) => void;
   fav: boolean;
   onFav: (g: Game) => void;
+  /** Abre um endereço no navegador do hub. */
+  onSite: (url: string) => void;
 }
 
 const BASE_TABS = ["Visão geral", "Sessões"];
 const DAYS = 14;
 
 /** Página de um jogo: números, ações e as sessões que o hub gravou. */
-export function GamePage({ game, onPlay, onCover, fav, onFav }: Props) {
+export function GamePage({ game, onPlay, onCover, fav, onFav, onSite }: Props) {
   const [tab, setTab] = useState(0);
   const [sessions, setSessions] = useState<Session[] | null>(null);
 
@@ -68,6 +70,9 @@ export function GamePage({ game, onPlay, onCover, fav, onFav }: Props) {
           <button className="btn" data-nav aria-pressed={fav} onClick={() => onFav(game)}>
             <span className="g">Y</span>
             {fav ? "★ Favorito" : "Favoritar"}
+          </button>
+          <button className="btn" data-nav onClick={() => onSite(`https://howlongtobeat.com/?q=${encodeURIComponent(game.title)}`)}>
+            HowLongToBeat
           </button>
           {game.installDir && (
             <button className="btn" data-nav onClick={() => openFolder(game.installDir!)}>

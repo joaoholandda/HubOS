@@ -92,3 +92,4 @@
 | 72 | Navegador | DECIDIDO | Navegador próprio dentro do hub (não é o Firefox; login feito uma vez nele) | 2026-11-11 |
 | 73 | Party do Discord | DECIDIDO | Dentro do hub, controlando o Discord do PC por um aplicativo do Discord criado pelo dono (Client ID e Secret colados em Configurações) | 2026-11-11 |
 | 74 | AudioHub | ADIADO | Integração fica para depois, a pedido | 2026-11-11 |
+| 75 | HowLongToBeat | DECIDIDO (1ª versão) | Botão na página do jogo abre a busca do jogo no navegador do hub. Números dentro da página ficam para quando houver um jeito confiável de buscar | 2026-11-12 |
